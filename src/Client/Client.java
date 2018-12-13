@@ -16,6 +16,13 @@ public class Client
 		this.listOfFiles = listOfFiles;
 	}
 	
+	//Temporary constructor without name
+	public Client( String ip, File[] listOfFiles)
+	{
+		this.ip = ip;
+		this.listOfFiles = listOfFiles;
+	}
+	
 	public String getName() 
 	{
 		return name;
