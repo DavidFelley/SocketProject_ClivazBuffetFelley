@@ -11,16 +11,10 @@ import java.util.logging.Logger;
 
 public class Server {
 	
-	protected static Logger myLogger;
-	protected static SimpleDateFormat formater = null;
-	protected static Date date;
-	protected static Calendar cal;
-	protected static int refDay;
-	private FileHandler fh;
+	
 	
 	public Server() 
 	{
-		createLogs();
 	
 	}
 
@@ -75,36 +69,5 @@ public class Server {
 		
 		
 	}
-	public  void createLogs() {
-		// Déclaration des variables
-		myLogger = Logger.getLogger("TestLog");
-		formater = null;
-		date = new Date();
-		cal = Calendar.getInstance();
-		cal.setTime(date);
-		 // Jour de référence pour le fichier log au lancement du serveur
-		refDay = cal.get(Calendar.DAY_OF_MONTH);
-		formater = new SimpleDateFormat("yyyyMMdd");
-
-		try 
-		{
-			fh = new FileHandler("C:/Leaf/server/logs/" + formater.format(date) + ".log", true);
-			myLogger.addHandler(fh);
-
-			// Utilisation du format défini
-			SocketFormatter myFormatter = new SocketFormatter();
-			fh.setFormatter(myFormatter);
-			
-		} 
-		catch (SecurityException ex) 
-		{
-			myLogger.setLevel(Level.SEVERE);
-			myLogger.severe("SecurityException :"+ex.toString());
-		} 
-		catch (IOException ex) 
-		{
-			myLogger.setLevel(Level.SEVERE);
-			myLogger.severe("IOException :"+ex.toString());
-		}
-	}
+	
 }
