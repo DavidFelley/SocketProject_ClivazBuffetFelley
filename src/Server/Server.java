@@ -16,12 +16,6 @@ public class Server {
 	public Server() 
 	{
 	
-	}
-
-	public static void main(String[] args){
-		
-		Server a = new Server ();
-
 		InetAddress localAddress = null;
 		ServerSocket mySkServer;
 		String interfaceName = "eth1";
@@ -67,7 +61,8 @@ public class Server {
 			e.printStackTrace();
 		}
 		
-		
 	}
+
+	
 	
 }
