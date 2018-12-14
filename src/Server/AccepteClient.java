@@ -8,30 +8,28 @@ public class AccepteClient implements Runnable {
 
 	private Socket clientSocketOnServer;
 	private int clientNumber;
+	Frame frame ;
 	
 	private String clientID;
 	private String clientIP;
 	
 
-	private void Client(String clientID, String clientIP )
-	{
-		this.clientID = clientID;
-		this.clientIP = clientIP;
-		
-	}
+	
 	//Constructor
-	public AccepteClient (Socket clientSocketOnServer, int clientNo)
+	public AccepteClient (Socket clientSocketOnServer, int clientNo, Frame frame)
 	{
 		this.clientSocketOnServer = clientSocketOnServer;
 		this.clientNumber = clientNo;
+		this.frame = frame;
 
 	}
 	//overwrite the thread run()
 	public void run() {
 
 		try {
-				System.out.println("Client Nr "+clientNumber+ " is connected");
-				System.out.println("Socket is available for connection"+ clientSocketOnServer);
+			frame.createLabel("Client Nr "+clientNumber+ " is connected");
+			frame.createLabel("Socket is available for connection"+ clientSocketOnServer);
+				
 				
 				
 				//open the output data stream to write on the client

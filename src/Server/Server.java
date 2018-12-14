@@ -20,7 +20,7 @@ public class Server {
 		ServerSocket mySkServer;
 		String interfaceName = "eth1";
 		
-		 
+		Frame frame = new Frame();
 
 		int ClientNo = 1;
 		
@@ -40,9 +40,13 @@ public class Server {
 			
 			//Warning : the backlog value (2nd parameter is handled by the implementation
 			mySkServer = new ServerSocket(45000,10,localAddress);
-			System.out.println("Default Timeout :" + mySkServer.getSoTimeout());
-			System.out.println("Used IpAddress :" + mySkServer.getInetAddress());
-			System.out.println("Listening to Port :" + mySkServer.getLocalPort());
+			
+			frame.createLabel("Default Timeout :" + mySkServer.getSoTimeout());
+			frame.createLabel("Used IpAddress :" + mySkServer.getInetAddress());
+
+			frame.createLabel("Listening to Port :" + mySkServer.getLocalPort());
+
+		
 			
 		
 			//wait for a client connection
@@ -52,7 +56,7 @@ public class Server {
      		  
                System.out.println("connection request received");
                
-               Thread t = new Thread(new AccepteClient(clientSocket,ClientNo));
+               Thread t = new Thread(new AccepteClient(clientSocket,ClientNo, frame));
                
                Register.register(clientSocket, ClientNo);
                ClientNo++;
