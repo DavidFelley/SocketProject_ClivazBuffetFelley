@@ -8,7 +8,17 @@ public class AccepteClient implements Runnable {
 
 	private Socket clientSocketOnServer;
 	private int clientNumber;
+	
+	private String clientID;
+	private String clientIP;
+	
 
+	private void Client(String clientID, String clientIP )
+	{
+		this.clientID = clientID;
+		this.clientIP = clientIP;
+		
+	}
 	//Constructor
 	public AccepteClient (Socket clientSocketOnServer, int clientNo)
 	{
@@ -23,6 +33,7 @@ public class AccepteClient implements Runnable {
 				System.out.println("Client Nr "+clientNumber+ " is connected");
 				System.out.println("Socket is available for connection"+ clientSocketOnServer);
 				
+				
 				//open the output data stream to write on the client
 				PrintWriter pout = new PrintWriter(clientSocketOnServer.getOutputStream());
 				
@@ -30,16 +41,15 @@ public class AccepteClient implements Runnable {
 				pout.println(clientNumber);
 				pout.flush();	
 				
-					
-				Thread.sleep(3000);
+
 				
-				System.out.println("end of connection to the client " + clientNumber);
+				
+			
+				
 				
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		} 
 	}
 
 }
