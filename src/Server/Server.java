@@ -46,9 +46,6 @@ public class Server {
 
 			frame.createLabel("Listening to Port :" + mySkServer.getLocalPort());
 
-		
-			
-		
 			//wait for a client connection
 			while(true)
 			{

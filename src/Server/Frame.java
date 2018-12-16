@@ -29,25 +29,20 @@ public class Frame {
 
 	private JFrame frmServer;
 	JPanel panel_1 = new JPanel();
-	
-
-
-	/**
-	 * Launch the application.
-	 */
-	
 
 	/**
 	 * Create the application.
 	 */
-	public Frame() {
+	public Frame() 
+	{
 		initialize();
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize() 
+	{
 		frmServer = new JFrame();
 		frmServer.setTitle("SERVER");
 		frmServer.setAlwaysOnTop(true);
@@ -111,9 +106,6 @@ public class Frame {
 		
 		Choice choice = new Choice();
 		panel_3.add(choice, BorderLayout.NORTH);
-		choice.add("loris");
-		choice.add("david");
-		choice.add("loan");
 		
 		JLabel lblNewLabel_2 = new JLabel("LIST OF FILES");
 		lblNewLabel_2.setForeground(Color.RED);
@@ -126,37 +118,40 @@ public class Frame {
 		scrollPane.setViewportView(panel_1);
 		panel.add(scrollPane);
 		
-		
-		
 		frmServer.repaint();
-		frmServer.validate();
-		
-		
+		frmServer.validate();	
 	}
 	
 	public void createLabel(String message)
 	{
 		JLabel lbl = new JLabel( message);
 		
-		
 		panel_1.add(lbl);
-		
 		panel_1.validate();
 		panel_1.repaint();
 	}
-	private static void addPopup(Component component, final JPopupMenu popup) {
-		component.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				if (e.isPopupTrigger()) {
+	
+	
+	private static void addPopup(Component component, final JPopupMenu popup)
+	{
+		component.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				if (e.isPopupTrigger())
+				{
 					showMenu(e);
 				}
 			}
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
+			public void mouseReleased(MouseEvent e)
+			{
+				if (e.isPopupTrigger())
+				{
 					showMenu(e);
 				}
 			}
-			private void showMenu(MouseEvent e) {
+			private void showMenu(MouseEvent e) 
+			{
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});

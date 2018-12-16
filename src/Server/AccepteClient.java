@@ -9,12 +9,10 @@ public class AccepteClient implements Runnable {
 	private Socket clientSocketOnServer;
 	private int clientNumber;
 	Frame frame ;
-	
+
 	private String clientID;
 	private String clientIP;
-	
 
-	
 	//Constructor
 	public AccepteClient (Socket clientSocketOnServer, int clientNo, Frame frame)
 	{
@@ -24,28 +22,23 @@ public class AccepteClient implements Runnable {
 
 	}
 	//overwrite the thread run()
-	public void run() {
+	public void run() 
+	{
 
 		try {
 			frame.createLabel("Client Nr "+clientNumber+ " is connected");
 			frame.createLabel("Socket is available for connection"+ clientSocketOnServer);
-				
-				
-				
-				//open the output data stream to write on the client
-				PrintWriter pout = new PrintWriter(clientSocketOnServer.getOutputStream());
-				
-				//write the message on the output stream
-				pout.println(clientNumber);
-				pout.flush();	
-				
 
-				
-				
-			
-				
-				
-		} catch (IOException e) {
+			//open the output data stream to write on the client
+			PrintWriter pout = new PrintWriter(clientSocketOnServer.getOutputStream());
+
+			//write the message on the output stream
+			pout.println(clientNumber);
+			pout.flush();	
+
+		} 
+		catch (IOException e) 
+		{
 			e.printStackTrace();
 		} 
 	}

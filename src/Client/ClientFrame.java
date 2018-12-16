@@ -6,24 +6,46 @@ import java.awt.BorderLayout;
 import javax.swing.JTextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.charset.MalformedInputException;
+import java.nio.file.Files;
+
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
+import java.awt.FlowLayout;
+import javax.swing.border.LineBorder;
 
 public class ClientFrame 
 {
-	//Variable of connection
+	//Variables of connection
 	private String login = "";
 	private String password = "";
 	private String ipServer = "";
-
+	private String ipClient = "";
+	private Socket clientSocket = null;
+	private ObjectOutputStream oos = null;
+	private ObjectInputStream ois = null;
+	
+	//Variables graphiques
 	private JFrame frame;
 	private JTextField loginField;
 	private JTextField serverField;
 	private JPasswordField passwordField;
+	
+	CardLayout cardlayout = new CardLayout();
+	JPanel mainPanel = new JPanel(cardlayout);
 
 	/**
 	 * Create the application.
@@ -42,13 +64,12 @@ public class ClientFrame
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 1000, 650);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		JPanel cardPanelLogin = new JPanel();
-		frame.getContentPane().add(cardPanelLogin, BorderLayout.CENTER);
-		cardPanelLogin.setLayout(new CardLayout(0, 0));
+		frame.getContentPane().add(mainPanel);
 
 		JPanel panelLogin = new JPanel();
-		cardPanelLogin.add(panelLogin, "name_176977898076169");
+		mainPanel.add(panelLogin, "panelLogin");
 		panelLogin.setBackground(Color.DARK_GRAY);
 		panelLogin.setLayout(null);
 
@@ -96,22 +117,58 @@ public class ClientFrame
 		btnSignIn.setForeground(Color.WHITE);
 		btnSignIn.setBounds(629, 528, 97, 25);
 		panelLogin.add(btnSignIn);
-		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.NORTH);
+
+		JPanel panelServer = new JPanel();
+		mainPanel.add(panelServer, "panelServer");
+		panelServer.setBackground(Color.DARK_GRAY);
+		panelServer.setLayout(null);
 		
 		frame.setVisible(true);
 		
 	}
 
-	private void connect()
+	private void connect() throws IOException
 	{	
+		clientSocket = new Socket();
+		
 		ipServer = serverField.getText();
-		//Create a new thread
-		ClientConnectionThread clientThread = new ClientConnectionThread();
 
-		//Launch the thread with ipServer and port
-		clientThread.launchThread(ipServer,45000);
+		InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
+		
+		clientSocket.connect(serverSocket, 5);
+		
+		oos = new ObjectOutputStream(clientSocket.getOutputStream());
+		ois = new ObjectInputStream(clientSocket.getInputStream());
+		
+		oos.writeObject(sendInformations());
+		
+	}
+
+	
+	private Client sendInformations()
+	{
+		login = loginField.getText();
+		
+		ipClient = clientSocket.getLocalAddress().getHostAddress();
+		
+		File listOfFiles[] = getListOfFiles();
+		
+		Client client = new Client(login, ipClient, listOfFiles);
+		
+		return client;
+		
+	}
+	
+	private File[] getListOfFiles()
+	{
+		File directory = new File("C:\\SharedDocuments");
+		
+		if(!directory.exists())
+			directory.mkdir();
+		
+		File  files [] = directory.listFiles();
+		
+		return files;
 	}
 	
 	class LoginClick implements ActionListener
@@ -119,8 +176,18 @@ public class ClientFrame
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
-			connect();
+			try 
+			{
+				connect();
+			} 
+			catch (IOException e1) 
+			{
+				e1.printStackTrace();
+			}
+			
+			cardlayout.show(mainPanel, "panelServer");
+			
 		}
-		
+
 	}
 }
