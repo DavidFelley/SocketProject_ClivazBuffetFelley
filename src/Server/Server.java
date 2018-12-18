@@ -20,8 +20,7 @@ import java.util.logging.Logger;
 public class Server  {
 
 	Socket clientSocket = null;
-	BufferedReader buffin = null;
-	PrintWriter pout = null;
+	
 
 	BufferedWriter write = null;
 	PrintWriter write2 = null;
@@ -79,20 +78,8 @@ public class Server  {
 				//starting the thread
 				t.start();
 				
-				while(true)
-				{
-					//create an input stream to read data from the server
-					buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
-
-					//open the output data stream to write on the client
-					pout = new PrintWriter(clientSocket.getOutputStream());
-
-
-					pout.println("miam");
-					pout.flush();
-
-					System.out.println(buffin.readLine());
-				}
+				
+				
 			
 			}
 			
@@ -102,6 +89,8 @@ public class Server  {
 
 			e.printStackTrace();
 		} 
+		
+		
 
 	}
 
