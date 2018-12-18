@@ -21,13 +21,14 @@ import Client.Client;
 
 public class Server  {
 
+	Socket clientSocket = null;
 	BufferedReader buffin = null;
 	PrintWriter pout = null;
-	
+
 	BufferedWriter write = null;
 	PrintWriter write2 = null;
-	
-	
+
+
 
 
 	public Server() 
@@ -67,28 +68,37 @@ public class Server  {
 			//wait for a client connection
 			while(true)
 			{
-				Socket clientSocket = mySkServer.accept();
+				clientSocket = mySkServer.accept();
 
 				System.out.println("connection request received");
 
 				Thread t = new Thread(new AccepteClient(clientSocket,ClientNo, frame));
 
-				//create an input stream to read data from the server
-				 buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
+
 				
-				//open the output data stream to write on the client
-				 pout = new PrintWriter(clientSocket.getOutputStream());
-				 
-				 
-				pout.println("miam");
-				pout.flush();
-				
-				System.out.println(buffin.readLine());
 				Register.register(clientSocket, ClientNo);
 				ClientNo++;
 				//starting the thread
 				t.start();
+				
+				while(true)
+				{
+					//create an input stream to read data from the server
+					buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
+
+					//open the output data stream to write on the client
+					pout = new PrintWriter(clientSocket.getOutputStream());
+
+
+					pout.println("miam");
+					pout.flush();
+
+					System.out.println(buffin.readLine());
+				}
+			
 			}
+			
+			
 
 		} catch (IOException e) {
 
@@ -97,6 +107,6 @@ public class Server  {
 
 	}
 
-	
+
 
 }
