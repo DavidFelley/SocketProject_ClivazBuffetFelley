@@ -113,7 +113,7 @@ public class Frame {
 		panel.add(lblNewLabel_2);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(822, 42, 324, 304);
 		scrollPane.setViewportView(panel_1);
 		panel.add(scrollPane);
