@@ -19,6 +19,11 @@ import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
+import javax.swing.JScrollPane;
+import javax.swing.JList;
+import java.awt.Button;
+import java.awt.GridLayout;
+import javax.swing.BoxLayout;
 
 public class ClientFrame 
 {
@@ -37,7 +42,8 @@ public class ClientFrame
 	private JTextField loginField;
 	private JTextField serverField;
 	private JPasswordField passwordField;
-	
+	private JPanel panelSharedFiles ;
+	private JPanel panelListShared;
 	CardLayout cardlayout = new CardLayout();
 	JPanel mainPanel = new JPanel(cardlayout);
 
@@ -117,10 +123,41 @@ public class ClientFrame
 		panelServer.setBackground(Color.DARK_GRAY);
 		panelServer.setLayout(null);
 		
+		JPanel panelFiles = new JPanel();
+		panelFiles.setBounds(0, 0, 280, 420);
+		panelServer.add(panelFiles);
+		
+		JList listSharedFiles = new JList();
+		panelFiles.add(listSharedFiles);
+		
+		panelSharedFiles = new JPanel();
+		panelSharedFiles.setBounds(703, 0, 291, 420);
+		panelServer.add(panelSharedFiles);
+		panelSharedFiles.setLayout(new BorderLayout(10, 0));
+		
+		JPanel panel = new JPanel();
+		panelSharedFiles.add(panel, BorderLayout.NORTH);
+		
+		JLabel lblSharedFiles = new JLabel("Shared Files");
+		panel.add(lblSharedFiles);
+		
+		panelListShared= new JPanel();
+		panelSharedFiles.add(panelListShared, BorderLayout.CENTER);
+		
 		frame.setVisible(true);
 		
 	}
 
+	private void addFileInList(String path)
+	{
+		JLabel lblfileName = new JLabel(path);
+		panelListShared.add(lblfileName);
+		
+		panelSharedFiles.validate();
+		panelSharedFiles.repaint();
+		
+	}
+	
 	private void connect() throws IOException
 	{	
 		clientSocket = new Socket();
@@ -161,6 +198,8 @@ public class ClientFrame
 			
 			pout.println(files[i]);
 			pout.flush();
+			
+			addFileInList(files[i]);
 		}
 		
 		return files;
