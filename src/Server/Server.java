@@ -1,7 +1,12 @@
 package Server;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.*;
 import java.text.SimpleDateFormat;
@@ -16,6 +21,12 @@ import Client.Client;
 
 public class Server  {
 
+	BufferedReader buffin = null;
+	PrintWriter pout = null;
+	
+	BufferedWriter write = null;
+	PrintWriter write2 = null;
+	
 	
 
 
@@ -62,9 +73,17 @@ public class Server  {
 
 				Thread t = new Thread(new AccepteClient(clientSocket,ClientNo, frame));
 
-
+				//create an input stream to read data from the server
+				 buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
 				
+				//open the output data stream to write on the client
+				 pout = new PrintWriter(clientSocket.getOutputStream());
+				 
+				 
+				pout.println("miam");
+				pout.flush();
 				
+				System.out.println(buffin.readLine());
 				Register.register(clientSocket, ClientNo);
 				ClientNo++;
 				//starting the thread
@@ -78,6 +97,6 @@ public class Server  {
 
 	}
 
-
+	
 
 }
