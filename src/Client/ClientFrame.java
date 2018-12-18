@@ -6,8 +6,10 @@ import java.awt.BorderLayout;
 import javax.swing.JTextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -16,6 +18,8 @@ import java.net.Socket;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
@@ -23,7 +27,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import java.awt.Button;
 import java.awt.GridLayout;
+
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.JScrollBar;
 
 public class ClientFrame 
 {
@@ -36,7 +43,8 @@ public class ClientFrame
 	private Socket clientSocket = null;
 	private BufferedReader buffin;
 	private PrintWriter pout;
-	
+	private JFileChooser fc = new JFileChooser();
+
 	//Variables graphiques
 	private JFrame frame;
 	private JTextField loginField;
@@ -44,8 +52,9 @@ public class ClientFrame
 	private JPasswordField passwordField;
 	private JPanel panelSharedFiles ;
 	private JPanel panelListShared;
-	CardLayout cardlayout = new CardLayout();
-	JPanel mainPanel = new JPanel(cardlayout);
+	private CardLayout cardlayout = new CardLayout();
+	private JPanel mainPanel = new JPanel(cardlayout);
+	private JPanel panelServer;
 
 	/**
 	 * Create the application.
@@ -65,7 +74,7 @@ public class ClientFrame
 		frame.setBounds(100, 100, 1000, 650);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		
+
 		frame.getContentPane().add(mainPanel);
 
 		JPanel panelLogin = new JPanel();
@@ -118,93 +127,98 @@ public class ClientFrame
 		btnSignIn.setBounds(629, 528, 97, 25);
 		panelLogin.add(btnSignIn);
 
-		JPanel panelServer = new JPanel();
+		panelServer = new JPanel();
 		mainPanel.add(panelServer, "panelServer");
 		panelServer.setBackground(Color.DARK_GRAY);
 		panelServer.setLayout(null);
-		
+
 		JPanel panelFiles = new JPanel();
 		panelFiles.setBounds(0, 0, 280, 420);
 		panelServer.add(panelFiles);
-		
+
 		JList listSharedFiles = new JList();
 		panelFiles.add(listSharedFiles);
-		
+
 		panelSharedFiles = new JPanel();
 		panelSharedFiles.setBounds(703, 0, 291, 420);
 		panelServer.add(panelSharedFiles);
 		panelSharedFiles.setLayout(new BorderLayout(10, 0));
-		
+
 		JPanel panel = new JPanel();
 		panelSharedFiles.add(panel, BorderLayout.NORTH);
-		
+
 		JLabel lblSharedFiles = new JLabel("Shared Files");
 		panel.add(lblSharedFiles);
-		
+
 		panelListShared= new JPanel();
 		panelSharedFiles.add(panelListShared, BorderLayout.CENTER);
-		
+
+		JButton btnAddFile = new JButton("Add File");
+		btnAddFile.addActionListener(new addFile());
+		btnAddFile.setBounds(703, 446, 97, 25);
+		panelServer.add(btnAddFile);
+
 		frame.setVisible(true);
-		
+
 	}
 
 	private void addFileInList(String path)
 	{
 		JLabel lblfileName = new JLabel(path);
 		panelListShared.add(lblfileName);
-		
+
 		panelSharedFiles.validate();
 		panelSharedFiles.repaint();
-		
+
 	}
-	
+
 	private void connect() throws IOException
 	{	
 		clientSocket = new Socket();
-		
+
 		ipServer = serverField.getText();
 
 		InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
-		
+
 		clientSocket.connect(serverSocket);
-		
+
 		//create an input stream to read data from the server
 		buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
-		
+
 		//open the output data stream to write on the client
 		pout = new PrintWriter(clientSocket.getOutputStream());
-		
+
 		getListOfFiles();
-		
+
 		login = loginField.getText();
-		
+
 		System.out.println(buffin.readLine());
-		
+
 	}
-	
+
 	private String[] getListOfFiles()
 	{
 		File directory = new File("C:\\SharedDocuments");
-		
+
 		if(!directory.exists())
 			directory.mkdir();
-		
+
 		files = new String [directory.list().length];
-				
+
 		for (int i = 0; i < directory.list().length; i++) 
 		{
 			File [] lst = directory.listFiles();
 			files[i] = lst[i].getAbsolutePath();
-			
+
 			pout.println(files[i]);
 			pout.flush();
-			
+
 			addFileInList(files[i]);
 		}
-		
+
 		return files;
 	}
-	
+
 	class LoginClick implements ActionListener
 	{
 		@Override
@@ -218,10 +232,42 @@ public class ClientFrame
 			{
 				e1.printStackTrace();
 			}
-			
-			cardlayout.show(mainPanel, "panelServer");
-			
-		}
 
+			cardlayout.show(mainPanel, "panelServer");
+
+		}
+	}
+	class addFile implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e) 
+		{
+			int resultat = fc.showOpenDialog(panelServer);
+
+			if(resultat == fc.CANCEL_OPTION)
+			{
+				fc.cancelSelection();
+				return;
+			}
+
+			if (resultat == fc.APPROVE_OPTION) 
+			{
+				saveToDirectory(fc.getSelectedFile().getAbsolutePath());
+			}
+		}
+	}
+
+
+	private void saveToDirectory(String path) 
+	{
+
+		try{
+			File file = new File(path);
+
+			if(file.renameTo(new File("C:\\SharedDocuments\\" + file.getName())));
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 }
