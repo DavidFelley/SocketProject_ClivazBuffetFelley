@@ -10,22 +10,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.nio.charset.MalformedInputException;
-import java.nio.file.Files;
-
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
-import java.awt.FlowLayout;
-import javax.swing.border.LineBorder;
 
 public class ClientFrame 
 {
@@ -34,9 +27,10 @@ public class ClientFrame
 	private String password = "";
 	private String ipServer = "";
 	private String ipClient = "";
+	String  files [] ;
 	private Socket clientSocket = null;
-	private ObjectOutputStream oos = null;
-	private ObjectInputStream ois = null;
+	private BufferedReader buffin;
+	private PrintWriter pout;
 	
 	//Variables graphiques
 	private JFrame frame;
@@ -135,38 +129,39 @@ public class ClientFrame
 
 		InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
 		
-		clientSocket.connect(serverSocket, 5);
+		clientSocket.connect(serverSocket);
 		
-		oos = new ObjectOutputStream(clientSocket.getOutputStream());
-		ois = new ObjectInputStream(clientSocket.getInputStream());
+		//create an input stream to read data from the server
+		buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
 		
-		oos.writeObject(sendInformations());
+		//open the output data stream to write on the client
+		pout = new PrintWriter(clientSocket.getOutputStream());
 		
-	}
-
-	
-	private Client sendInformations()
-	{
+		getListOfFiles();
+		
 		login = loginField.getText();
 		
-		ipClient = clientSocket.getLocalAddress().getHostAddress();
-		
-		File listOfFiles[] = getListOfFiles();
-		
-		Client client = new Client(login, ipClient, listOfFiles);
-		
-		return client;
+		System.out.println(buffin.readLine());
 		
 	}
 	
-	private File[] getListOfFiles()
+	private String[] getListOfFiles()
 	{
 		File directory = new File("C:\\SharedDocuments");
 		
 		if(!directory.exists())
 			directory.mkdir();
 		
-		File  files [] = directory.listFiles();
+		files = new String [directory.list().length];
+				
+		for (int i = 0; i < directory.list().length; i++) 
+		{
+			File [] lst = directory.listFiles();
+			files[i] = lst[i].getAbsolutePath();
+			
+			pout.println(files[i]);
+			pout.flush();
+		}
 		
 		return files;
 	}
