@@ -36,7 +36,7 @@ public class Server  {
 		ServerSocket mySkServer;
 		String interfaceName = "eth1";
 
-		Frame frame = new Frame();
+		ServerFrame frame = new ServerFrame();
 
 		int ClientNo = 1;
 

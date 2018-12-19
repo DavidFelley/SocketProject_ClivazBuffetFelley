@@ -10,7 +10,7 @@ public class AccepteClient implements Runnable {
 
 	private Socket clientSocketOnServer;
 	private int clientNumber;
-	Frame frame ;
+	ServerFrame frame ;
 
 	private String clientID;
 	private String clientIP;
@@ -19,7 +19,7 @@ public class AccepteClient implements Runnable {
 	PrintWriter pout = null;
 
 	//Constructor
-	public AccepteClient (Socket clientSocketOnServer, int clientNo, Frame frame)
+	public AccepteClient (Socket clientSocketOnServer, int clientNo, ServerFrame frame)
 	{
 		this.clientSocketOnServer = clientSocketOnServer;
 		this.clientNumber = clientNo;
