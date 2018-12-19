@@ -28,7 +28,7 @@ import java.awt.Choice;
 public class ServerFrame {
 
 	private JFrame frmServer;
-	JPanel panel_1 = new JPanel();
+	JPanel panelInfoServer = new JPanel();
 
 	/**
 	 * Create the application.
@@ -78,13 +78,13 @@ public class ServerFrame {
 		lblChat.setBounds(962, 422, 56, 16);
 		panel.add(lblChat);
 		
-		panel_1.setBackground(Color.GRAY);
+		panelInfoServer.setBackground(Color.GRAY);
 
-		panel_1.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
+		panelInfoServer.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
 
-		panel_1.setBounds(755, 35, 315, 372);
+		panelInfoServer.setBounds(755, 35, 315, 372);
 
-		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
+		panelInfoServer.setLayout(new BoxLayout(panelInfoServer, BoxLayout.Y_AXIS));
 
 		JLabel lblServer = new JLabel("SERVER");
 		lblServer.setForeground(Color.RED);
@@ -93,31 +93,31 @@ public class ServerFrame {
 
 
 
-		JPanel panel_2 = new JPanel();
-		panel_2.setBackground(Color.GRAY);
-		panel_2.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
-		panel_2.setBounds(831, 451, 315, 193);
-		panel.add(panel_2);
+		JPanel panelChat = new JPanel();
+		panelChat.setBackground(Color.GRAY);
+		panelChat.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
+		panelChat.setBounds(831, 451, 315, 193);
+		panel.add(panelChat);
 
-		JPanel panel_3 = new JPanel();
-		panel_3.setBackground(Color.GRAY);
-		panel_3.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
-		panel_3.setBounds(30, 39, 295, 372);
-		panel.add(panel_3);
-		panel_3.setLayout(new BorderLayout(0, 0));
+		JPanel panelListFiles = new JPanel();
+		panelListFiles.setBackground(Color.GRAY);
+		panelListFiles.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
+		panelListFiles.setBounds(30, 39, 295, 372);
+		panel.add(panelListFiles);
+		panelListFiles.setLayout(new BorderLayout(0, 0));
 
 		Choice choice = new Choice();
-		panel_3.add(choice, BorderLayout.NORTH);
+		panelListFiles.add(choice, BorderLayout.NORTH);
 
-		JLabel lblNewLabel_2 = new JLabel("LIST OF FILES");
-		lblNewLabel_2.setForeground(Color.RED);
-		lblNewLabel_2.setBounds(130, 3, 90, 23);
-		panel.add(lblNewLabel_2);
+		JLabel LabelListOfFiles = new JLabel("LIST OF FILES");
+		LabelListOfFiles.setForeground(Color.RED);
+		LabelListOfFiles.setBounds(130, 3, 90, 23);
+		panel.add(LabelListOfFiles);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(822, 42, 324, 304);
-		scrollPane.setViewportView(panel_1);
+		scrollPane.setViewportView(panelInfoServer);
 		panel.add(scrollPane);
 
 		frmServer.repaint();
@@ -129,9 +129,9 @@ public class ServerFrame {
 	{
 		JLabel lbl = new JLabel( message);
 
-		panel_1.add(lbl);
-		panel_1.validate();
-		panel_1.repaint();
+		panelInfoServer.add(lbl);
+		panelInfoServer.validate();
+		panelInfoServer.repaint();
 	}
 
 
