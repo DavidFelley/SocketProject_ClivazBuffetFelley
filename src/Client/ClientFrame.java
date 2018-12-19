@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -19,7 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
@@ -27,7 +27,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import java.awt.Button;
 import java.awt.GridLayout;
-
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollBar;
@@ -42,8 +41,7 @@ public class ClientFrame
 	private String ipServer = "";
 	private String [] listOfFiles = null ;
 	private Socket clientSocket = null;
-	private BufferedReader buffin;
-	private PrintWriter pout = null;
+	private ObjectOutputStream out = null;
 	private JFileChooser fc = new JFileChooser();
 
 	//Variables graphiques
@@ -184,21 +182,15 @@ public class ClientFrame
 		clientSocket.connect(serverSocket);
 
 		login = loginField.getText();
-		ipClient = clientSocket.getInetAddress().getHostAddress();
+		ipClient = clientSocket.getLocalAddress().getHostAddress();
 		System.out.println(ipClient);
 		listOfFiles = getListOfFiles();
 		
-		Client client = new Client(login, ipClient, listOfFiles);
+		client = new Client(login, ipClient, listOfFiles);
 		
-		//create an input stream to read data from the server
-		buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
-
-		//open the output data stream to write on the client
-		pout = new PrintWriter(clientSocket.getOutputStream());
-
-		pout.println(client);
-		pout.flush();
+		out = new ObjectOutputStream(clientSocket.getOutputStream());
 		
+		out.writeObject(client);
 	}
 
 	private String [] getListOfFiles()
