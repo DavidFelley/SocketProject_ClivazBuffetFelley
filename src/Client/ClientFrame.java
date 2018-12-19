@@ -35,14 +35,15 @@ import javax.swing.JScrollBar;
 public class ClientFrame 
 {
 	//Variables of connection
+	private Client client = null;
 	private String login = "";
 	private String password = "";
-	private String ipServer = "";
 	private String ipClient = "";
-	String  files [] ;
+	private String ipServer = "";
+	private String [] listOfFiles = null ;
 	private Socket clientSocket = null;
 	private BufferedReader buffin;
-	private PrintWriter pout;
+	private PrintWriter pout = null;
 	private JFileChooser fc = new JFileChooser();
 
 	//Variables graphiques
@@ -182,40 +183,41 @@ public class ClientFrame
 
 		clientSocket.connect(serverSocket);
 
+		login = loginField.getText();
+		ipClient = clientSocket.getInetAddress().getHostAddress();
+		System.out.println(ipClient);
+		listOfFiles = getListOfFiles();
+		
+		Client client = new Client(login, ipClient, listOfFiles);
+		
 		//create an input stream to read data from the server
 		buffin = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
 
 		//open the output data stream to write on the client
 		pout = new PrintWriter(clientSocket.getOutputStream());
 
-		getListOfFiles();
-
-		login = loginField.getText();
-
-		System.out.println(buffin.readLine());
-
+		pout.println(client);
+		pout.flush();
+		
 	}
 
-	private String[] getListOfFiles()
+	private String [] getListOfFiles()
 	{
 		File directory = new File("C:\\SharedDocuments");
 
 		if(!directory.exists())
 			directory.mkdir();
 
-		files = new String [directory.list().length];
-
-		for (int i = 0; i < directory.list().length; i++) 
+		String [] files = new String [directory.list().length];
+		File [] lst = directory.listFiles();
+		
+		for (int i = 0; i < files.length; i++) 
 		{
-			File [] lst = directory.listFiles();
-			files[i] = lst[i].getAbsolutePath();
-
-			pout.println(files[i]);
-			pout.flush();
+			files[i] = lst[i].getName();
 
 			addFileInList(files[i]);
 		}
-
+		
 		return files;
 	}
 

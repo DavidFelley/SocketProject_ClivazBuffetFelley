@@ -54,14 +54,19 @@ public class ServerFrame {
 		frmServer.getContentPane().add(panelServer, BorderLayout.CENTER);
 		panelServer.setLayout(null);
 
-
 		JButton btnPower = new JButton("ShutDown");
 		btnPower.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		btnPower.setBackground(Color.RED);
 		btnPower.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
 		
-		btnPower.addActionListener(new ButtonExit() );
-		
+		btnPower.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+
+				System.exit(0);
+			}
+		});
 		btnPower.setBounds(12, 587, 128, 57);
 		panelServer.add(btnPower);
 
@@ -128,7 +133,6 @@ public class ServerFrame {
 		panelInfoServer.repaint();
 	}
 
-	
 
 	private static void addPopup(Component component, final JPopupMenu popup)
 	{
@@ -154,16 +158,4 @@ public class ServerFrame {
 			}
 		});
 	}
-}
-
-class ButtonExit implements ActionListener
-{
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-
-		
-		System.exit(0);
-	}
-	
 }

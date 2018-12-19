@@ -10,13 +10,11 @@ public class AccepteClient implements Runnable {
 
 	private Socket clientSocketOnServer;
 	private int clientNumber;
-	ServerFrame frame ;
-
-	private String clientID;
-	private String clientIP;
+	private BufferedReader buffin = null;
+	private PrintWriter pout = null;
 	
-	BufferedReader buffin = null;
-	PrintWriter pout = null;
+	ServerFrame frame ;
+	
 
 	//Constructor
 	public AccepteClient (Socket clientSocketOnServer, int clientNo, ServerFrame frame)
@@ -31,7 +29,8 @@ public class AccepteClient implements Runnable {
 	{
 
 		try {
-			frame.createLabel("Client Nr "+clientNumber+ " is connected");
+			
+			frame.createLabel("Client"+clientNumber+ " is connected");
 			frame.createLabel("Socket is available for connection"+ clientSocketOnServer);
 
 			//open the output data stream to write on the client
@@ -41,7 +40,6 @@ public class AccepteClient implements Runnable {
 			pout.println(clientNumber);
 			pout.flush();	
 			
-			
 			while(true)
 			{
 				//create an input stream to read data from the server
@@ -50,11 +48,8 @@ public class AccepteClient implements Runnable {
 				//open the output data stream to write on the client
 				pout = new PrintWriter(clientSocketOnServer.getOutputStream());
 
-
 				frame.createLabel(buffin.readLine());
-				
 			}
-
 		} 
 		catch (IOException e) 
 		{
