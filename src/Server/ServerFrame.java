@@ -60,14 +60,8 @@ public class ServerFrame {
 		btnPower.setBackground(Color.RED);
 		btnPower.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
 		
-		btnPower.addActionListener(new ActionListener() 
-		{
-			public void actionPerformed(ActionEvent arg0) 
-			{
-
-				System.exit(0);
-			}
-		});
+		btnPower.addActionListener(new ButtonExit() );
+		
 		btnPower.setBounds(12, 587, 128, 57);
 		panelServer.add(btnPower);
 
@@ -134,6 +128,7 @@ public class ServerFrame {
 		panelInfoServer.repaint();
 	}
 
+	
 
 	private static void addPopup(Component component, final JPopupMenu popup)
 	{
@@ -159,4 +154,16 @@ public class ServerFrame {
 			}
 		});
 	}
+}
+
+class ButtonExit implements ActionListener
+{
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		
+		System.exit(0);
+	}
+	
 }
