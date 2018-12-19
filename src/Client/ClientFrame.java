@@ -174,25 +174,24 @@ public class ClientFrame
 	private void connect() throws IOException
 	{	
 		clientSocket = new Socket();
-
+		
 		ipServer = serverField.getText();
 
 		InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
-
 		clientSocket.connect(serverSocket);
-
-		login = loginField.getText();
-		ipClient = clientSocket.getLocalAddress().getHostAddress();
-		System.out.println(ipClient);
-		listOfFiles = getListOfFiles();
-		
-		client = new Client(login, ipClient, listOfFiles);
 		
 		out = new ObjectOutputStream(clientSocket.getOutputStream());
+
+		login = loginField.getText();
+		password = passwordField.getText();
+		ipClient = clientSocket.getLocalAddress().getHostAddress();
+		listOfFiles = getListOfFiles();
+		
+		client = new Client(login, password, ipClient, listOfFiles);
 		
 		out.writeObject(client);
 	}
-
+	
 	private String [] getListOfFiles()
 	{
 		File directory = new File("C:\\SharedDocuments");
