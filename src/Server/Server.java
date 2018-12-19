@@ -1,6 +1,9 @@
 package Server;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -10,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -17,20 +21,22 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import Client.Client;
+
 public class Server  {
 
 	Socket clientSocket = null;
-	
 
 	BufferedWriter write = null;
 	PrintWriter write2 = null;
-
-
+	ArrayList <Client> clients= null;
+	
 
 
 	public Server() 
 	{
 
+		
 
 		InetAddress localAddress = null;
 		ServerSocket mySkServer;
@@ -57,10 +63,23 @@ public class Server  {
 			//Warning : the backlog value (2nd parameter is handled by the implementation
 			mySkServer = new ServerSocket(45000,10,localAddress);
 
+			
+			
 			frame.createLabel("Default Timeout :" + mySkServer.getSoTimeout());
 			frame.createLabel("Used IpAddress :" + mySkServer.getInetAddress());
 
 			frame.createLabel("Listening to Port :" + mySkServer.getLocalPort());
+
+			System.out.println("Liste des Users : ");
+			
+			clients=(ArrayList<Client>) deSerializeObject();
+
+
+			for (int i = 0; i < clients.size() ; i++) 
+			{
+
+				System.out.println(clients.get(i));
+			}
 
 			//wait for a client connection
 			while(true)
@@ -72,28 +91,43 @@ public class Server  {
 				Thread t = new Thread(new AccepteClient(clientSocket,ClientNo, frame));
 
 
-				
-				Register.register(clientSocket, ClientNo);
-				ClientNo++;
+
+
 				//starting the thread
 				t.start();
-				
-				
-				
-			
+
+
+
+
 			}
-			
-			
+
+
 
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		} 
-		
-		
+
+
 
 	}
 
-
+	@SuppressWarnings("unchecked")
+	public Object deSerializeObject() { 
+		
+		try {
+			FileInputStream fichier = new FileInputStream("Client/client.zer");
+			ObjectInputStream ois = new ObjectInputStream(fichier);
+			clients=(ArrayList<Client>) ois.readObject();
+			 System.out.println("objet lu");
+			 
+		}
+		catch (Exception e) 
+		{
+			clients=new ArrayList<Client>();
+		}
+	
+		return clients;
+	}
 
 }
