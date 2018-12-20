@@ -26,12 +26,15 @@ public class AccepteClient implements Runnable {
 
 	private String clientID;
 	private String clientIP;
+	
 
 	private ObjectInputStream in = null;
 
 	BufferedReader buffin = null;
 	PrintWriter pout = null;
 
+	Serialize serialize = new Serialize("/Client//client.zer");
+	
 	//Constructor
 	public AccepteClient (Socket clientSocketOnServer, int clientNo, ServerFrame frame)
 	{
@@ -67,7 +70,8 @@ public class AccepteClient implements Runnable {
 
 					list.add(client);
 
-					Serialisation(list);
+					
+					 serialize.serializeObject(list);
 
 					for (int i = 0; i < list.size(); i++)
 					{
@@ -94,37 +98,6 @@ public class AccepteClient implements Runnable {
 
 	}
 
-	public void Serialisation(ArrayList list)
-	{
 
-		File file = new File("Client");
-
-		if (file.exists()) {
-			System.out.println("Le dossier existe déjà : " + file.getAbsolutePath());
-		} else {
-			if (file.mkdir()) {
-				System.out.println("Ajout du dossier : " + file.getAbsolutePath());
-			} 
-
-			
-			try {
-				
-				
-				FileOutputStream fichier = new FileOutputStream("Client/client.ser");
-				
-				
-				ObjectOutputStream oos = new ObjectOutputStream(fichier);
-				
-				oos.writeObject(list);
-				System.out.println("objet ecris");
-				oos.flush();
-				oos.close();
-			}
-			catch (java.io.IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
 
 }

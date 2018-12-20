@@ -29,10 +29,12 @@ public class Server  {
 
 	BufferedWriter write = null;
 	PrintWriter write2 = null;
-	ArrayList <Client> clients= null;
+	Object clients= null;
 	
+	Serialize serialize = new Serialize("Client/client.zer");
 
 
+	@SuppressWarnings("unchecked")
 	public Server() 
 	{
 
@@ -47,6 +49,8 @@ public class Server  {
 		int ClientNo = 1;
 
 		try {
+			serialize.createFile();
+			
 			NetworkInterface ni = NetworkInterface.getByName(interfaceName);
 			Enumeration<InetAddress> inetAddresses =  ni.getInetAddresses();
 			while(inetAddresses.hasMoreElements()) {
@@ -72,15 +76,10 @@ public class Server  {
 
 			System.out.println("Liste des Users : ");
 			
-			clients=(ArrayList<Client>) deSerializeObject();
+			clients=serialize.deSerializeObject();
 
-
-			for (int i = 0; i < clients.size() ; i++) 
-			{
-
-				System.out.println(clients.get(i));
-			}
-
+			
+			
 			//wait for a client connection
 			while(true)
 			{
@@ -112,22 +111,6 @@ public class Server  {
 
 	}
 
-	@SuppressWarnings("unchecked")
-	public Object deSerializeObject() { 
-		
-		try {
-			FileInputStream fichier = new FileInputStream("Client/client.zer");
-			ObjectInputStream ois = new ObjectInputStream(fichier);
-			clients=(ArrayList<Client>) ois.readObject();
-			 System.out.println("objet lu");
-			 
-		}
-		catch (Exception e) 
-		{
-			clients=new ArrayList<Client>();
-		}
 	
-		return clients;
-	}
 
 }
