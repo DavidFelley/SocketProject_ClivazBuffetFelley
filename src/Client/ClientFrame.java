@@ -4,6 +4,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
+
+import Server.AccepteClient;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -16,6 +19,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
@@ -43,6 +48,8 @@ public class ClientFrame
 	private Socket clientSocket = null;
 	private ObjectOutputStream out = null;
 	private JFileChooser fc = new JFileChooser();
+	private ArrayList<Client> clients;
+
 
 	//Variables graphiques
 	private JFrame frame;
@@ -54,12 +61,15 @@ public class ClientFrame
 	private CardLayout cardlayout = new CardLayout();
 	private JPanel mainPanel = new JPanel(cardlayout);
 	private JPanel panelServer;
+	JLabel lblLogin;
 
 	/**
 	 * Create the application.
 	 */
 	public ClientFrame() 
 	{
+		clients = AccepteClient.list;
+
 		initialize();
 	}
 
@@ -95,7 +105,7 @@ public class ClientFrame
 		passwordField.setBounds(332, 237, 330, 22);
 		panelLogin.add(passwordField);
 
-		JLabel lblLogin = new JLabel("Login");
+		lblLogin = new JLabel("Login");
 		lblLogin.setForeground(Color.RED);
 		lblLogin.setFont(new Font("Tahoma", Font.BOLD, 20));
 		lblLogin.setBounds(332, 43, 191, 34);
@@ -174,24 +184,24 @@ public class ClientFrame
 	private void connect() throws IOException
 	{	
 		clientSocket = new Socket();
-		
+
 		ipServer = serverField.getText();
 
 		InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
 		clientSocket.connect(serverSocket);
-		
+
 		out = new ObjectOutputStream(clientSocket.getOutputStream());
 
 		login = loginField.getText();
 		password = passwordField.getText();
 		ipClient = clientSocket.getLocalAddress().getHostAddress();
 		listOfFiles = getListOfFiles();
-		
+
 		client = new Client(login, password, ipClient, listOfFiles);
-		
+
 		out.writeObject(client);
 	}
-	
+
 	private String [] getListOfFiles()
 	{
 		File directory = new File("C:\\SharedDocuments");
@@ -201,14 +211,14 @@ public class ClientFrame
 
 		String [] files = new String [directory.list().length];
 		File [] lst = directory.listFiles();
-		
+
 		for (int i = 0; i < files.length; i++) 
 		{
 			files[i] = lst[i].getName();
 
 			addFileInList(files[i]);
 		}
-		
+
 		return files;
 	}
 
@@ -219,6 +229,14 @@ public class ClientFrame
 		{
 			try 
 			{
+				for (Client client : clients) 
+				{
+					if(lblLogin.getText().equals(client.getName()))
+					{
+						System.out.println("Client deja enregistré");
+					}
+				}
+
 				connect();
 			} 
 			catch (IOException e1) 

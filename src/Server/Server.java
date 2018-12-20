@@ -29,17 +29,22 @@ public class Server  {
 
 	BufferedWriter write = null;
 	PrintWriter write2 = null;
-	Object clients= null;
+	ArrayList<Client> clients= null;
 	
-	Serialize serialize = new Serialize("Client/client.zer");
+	Serialize serialize = new Serialize("Client//client.zer");
 
 
 	@SuppressWarnings("unchecked")
 	public Server() 
 	{
+		System.out.println("Liste des Users : ");
 
+		clients=(ArrayList<Client>)(serialize.deSerializeObject());
+		for (Client client : clients) 
+		{
+			System.out.println(client.getName()+" "+client.getMdp()+" "+client.getIp());
+		}
 		
-
 		InetAddress localAddress = null;
 		ServerSocket mySkServer;
 		String interfaceName = "eth1";
@@ -74,9 +79,8 @@ public class Server  {
 
 			frame.createLabel("Listening to Port :" + mySkServer.getLocalPort());
 
-			System.out.println("Liste des Users : ");
 			
-			clients=serialize.deSerializeObject();
+			
 
 			
 			
@@ -87,7 +91,7 @@ public class Server  {
 
 				System.out.println("connection request received");
 
-				Thread t = new Thread(new AccepteClient(clientSocket,ClientNo, frame));
+				Thread t = new Thread(new AccepteClient(clientSocket,ClientNo, frame, clients));
 
 
 

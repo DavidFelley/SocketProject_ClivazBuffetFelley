@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.util.ArrayList;
 
@@ -17,7 +18,7 @@ import Client.Client;
 
 public class AccepteClient implements Runnable {
 
-	public static ArrayList<Client> list  = new ArrayList<>();
+	public static ArrayList<Client> list  ;
 
 	private Socket clientSocketOnServer;
 	private int clientNumber;
@@ -33,15 +34,15 @@ public class AccepteClient implements Runnable {
 	BufferedReader buffin = null;
 	PrintWriter pout = null;
 
-	Serialize serialize = new Serialize("/Client//client.zer");
+	Serialize serialize = new Serialize("Client//client.zer");
 	
 	//Constructor
-	public AccepteClient (Socket clientSocketOnServer, int clientNo, ServerFrame frame)
+	public AccepteClient (Socket clientSocketOnServer, int clientNo, ServerFrame frame,ArrayList<Client> list)
 	{
 		this.clientSocketOnServer = clientSocketOnServer;
 		this.clientNumber = clientNo;
 		this.frame = frame;
-
+		this.list=list;
 	}
 	//overwrite the thread run()
 	public void run() 
