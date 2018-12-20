@@ -29,6 +29,7 @@ public class ServerFrame {
 
 	private JFrame frmServer;
 	private JPanel panelInfoServer = new JPanel();
+	private JPanel panelListFiles;
 
 	/**
 	 * Create the application.
@@ -98,15 +99,12 @@ public class ServerFrame {
 		panelChat.setBounds(831, 451, 315, 193);
 		panelServer.add(panelChat);
 
-		JPanel panelListFiles = new JPanel();
+		panelListFiles = new JPanel();
 		panelListFiles.setBackground(Color.GRAY);
 		panelListFiles.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
 		panelListFiles.setBounds(30, 39, 295, 372);
 		panelServer.add(panelListFiles);
 		panelListFiles.setLayout(new BorderLayout(0, 0));
-
-		Choice choice = new Choice();
-		panelListFiles.add(choice, BorderLayout.NORTH);
 
 		JLabel LabelListOfFiles = new JLabel("LIST OF FILES");
 		LabelListOfFiles.setForeground(Color.RED);
@@ -133,6 +131,7 @@ public class ServerFrame {
 		panelInfoServer.repaint();
 	}
 
+	
 
 	private static void addPopup(Component component, final JPopupMenu popup)
 	{

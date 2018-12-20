@@ -1,4 +1,5 @@
 package Server;
+import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,31 +26,32 @@ import Client.Client;
 
 public class Server  {
 
-	Socket clientSocket = null;
-
-	BufferedWriter write = null;
-	PrintWriter write2 = null;
-	ArrayList<Client> clients= null;
+	private Socket clientSocket = null;
+	private BufferedWriter write = null;
+	private PrintWriter write2 = null;
+	private ArrayList<Client> clients= null;
 	
 	Serialize serialize = new Serialize("Client//client.zer");
+	ServerFrame frame = new ServerFrame();
 
 
 	@SuppressWarnings("unchecked")
 	public Server() 
 	{
-		System.out.println("Liste des Users : ");
+		frame.createLabel("User list : ");
+		
+		
 
 		clients=(ArrayList<Client>)(serialize.deSerializeObject());
 		for (Client client : clients) 
 		{
-			System.out.println(client.getName()+" "+client.getMdp()+" "+client.getIp());
+			frame.createLabel(client.getName()+" "+client.getMdp());
 		}
 		
 		InetAddress localAddress = null;
 		ServerSocket mySkServer;
 		String interfaceName = "eth1";
 
-		ServerFrame frame = new ServerFrame();
 
 		int ClientNo = 1;
 
@@ -72,26 +74,14 @@ public class Server  {
 			//Warning : the backlog value (2nd parameter is handled by the implementation
 			mySkServer = new ServerSocket(45000,10,localAddress);
 
-			
-			
-			frame.createLabel("Default Timeout :" + mySkServer.getSoTimeout());
-			frame.createLabel("Used IpAddress :" + mySkServer.getInetAddress());
-
-			frame.createLabel("Listening to Port :" + mySkServer.getLocalPort());
-
-			
-			
-
-			
-			
+						
 			//wait for a client connection
 			while(true)
 			{
 				clientSocket = mySkServer.accept();
 
-				System.out.println("connection request received");
 
-				Thread t = new Thread(new AccepteClient(clientSocket,ClientNo, frame, clients));
+				Thread t = new Thread(new AccepteClient(clientSocket, frame, clients));
 
 
 

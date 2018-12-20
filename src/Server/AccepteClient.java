@@ -1,16 +1,10 @@
 package Server;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.util.ArrayList;
 
@@ -22,75 +16,107 @@ public class AccepteClient implements Runnable {
 
 	private Socket clientSocketOnServer;
 	private int clientNumber;
-	ServerFrame frame ;
+	private ServerFrame frame ;
 	private Client client;
 
 	private String clientID;
 	private String clientIP;
+	private ArrayList<Client> clients= null;
+
 	
 
+	//Envoie d'info pour le server
+	private BufferedWriter buffinOut = null;
+	private PrintWriter validate = null;
 	private ObjectInputStream in = null;
+	private String validation = "";
 
-	BufferedReader buffin = null;
-	PrintWriter pout = null;
+
 
 	Serialize serialize = new Serialize("Client//client.zer");
-	
+
 	//Constructor
-	public AccepteClient (Socket clientSocketOnServer, int clientNo, ServerFrame frame,ArrayList<Client> list)
+	public AccepteClient (Socket clientSocketOnServer,  ServerFrame frame,ArrayList<Client> list)
 	{
 		this.clientSocketOnServer = clientSocketOnServer;
-		this.clientNumber = clientNo;
 		this.frame = frame;
 		this.list=list;
 	}
 	//overwrite the thread run()
+	@SuppressWarnings("unchecked")
 	public void run() 
 	{
 
 		try {
-			frame.createLabel("Client Nr "+clientNumber+ " is connected");
-			frame.createLabel("Socket is available for connection"+ clientSocketOnServer);
+			
 
-			//open the output data stream to write on the client
-			PrintWriter pout = new PrintWriter(clientSocketOnServer.getOutputStream());
-
-			//write the message on the output stream
-			pout.println(clientNumber);
-			pout.flush();	
-
-
+			PrintWriter validate = new PrintWriter(clientSocketOnServer.getOutputStream());
+			in = new ObjectInputStream(clientSocketOnServer.getInputStream());
 			while(true)
 			{
 
-				in = new ObjectInputStream(clientSocketOnServer.getInputStream());
+
+
 
 				try {
-
 					client = (Client) in.readObject();
-
-					list.add(client);
-
 					
-					 serialize.serializeObject(list);
-
-					for (int i = 0; i < list.size(); i++)
-					{
-						System.out.println(client.getName()+" "+ client.getMdp());
-					}
-
-
+					frame.createLabel(client.getName()+" is connected");
 				} catch (ClassNotFoundException e) {
-
-					System.out.println("Probleme concernant l'object");
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
-			}
+
+				//Controle si le client existe deja
+				clients=(ArrayList<Client>)(serialize.deSerializeObject());
 
 
-		} 
-		catch (IOException e) 
+				for (Client user : clients) 
+				{
+					
+					
+					if(user.getName().equals(client.getName()))
+					{
+						System.out.println("le client existe deja");
+						
+						if(user.getMdp().equals(client.getMdp()))
+						{
+							System.out.println("Mot de passe correct");
+							validation = "1";
+							break;
+
+						}
+						else
+						{
+							System.out.println("Mot de passe incorrect");
+							validation = "0";
+							break;
+						}
+						
+					}
+					validation = "0";
+
+				}
+				
+				validate.println(validation);
+				validate.flush();
+				System.out.println("validation" + validation);
+
+
+				//list.add(client);
+
+
+				serialize.serializeObject(list);
+
+				
+
+				
+			} 
+		
+
+
+		}catch (IOException e) 
 		{
 
 			e.printStackTrace();
