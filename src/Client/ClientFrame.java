@@ -19,6 +19,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.MessageDigestSpi;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -30,6 +31,8 @@ import java.awt.Color;
 import java.awt.CardLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
+
 import java.awt.Button;
 import java.awt.GridLayout;
 import javax.imageio.ImageIO;
@@ -62,8 +65,9 @@ public class ClientFrame
 	private CardLayout cardlayout = new CardLayout();
 	private JPanel mainPanel = new JPanel(cardlayout);
 	private JPanel panelServer;
-	JLabel lblLogin;
-
+	private JLabel lblLogin;
+	private MessageBoxes messageBoxes = new MessageBoxes();
+	
 	/**
 	 * Create the application.
 	 */
@@ -217,6 +221,7 @@ public class ClientFrame
 		}
 		else
 		{
+			messageBoxes.ShowError("Password or User Incorrect", "Error");
 			frame.repaint();
 			frame.validate();
 		}
@@ -273,8 +278,8 @@ public class ClientFrame
 			if (resultat == fc.APPROVE_OPTION) 
 			{
 				saveToDirectory(fc.getSelectedFile().getAbsolutePath());
-				panelListShared.repaint();
-				panelListShared.revalidate();
+				panelSharedFiles.add(panelListShared, BorderLayout.CENTER);
+
 			}
 		}
 	}

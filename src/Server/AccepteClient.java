@@ -61,7 +61,6 @@ public class AccepteClient implements Runnable {
 				try {
 					client = (Client) in.readObject();
 					
-					frame.createLabel(client.getName()+" is connected");
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -84,11 +83,15 @@ public class AccepteClient implements Runnable {
 						{
 							System.out.println("Mot de passe correct");
 							validation = "1";
+							frame.createLabel("Password Validate");
+							frame.createLabel(client.getName()+" is connected");
+
 							break;
 
 						}
 						else
 						{
+							frame.createLabel("False Password");
 							System.out.println("Mot de passe incorrect");
 							validation = "0";
 							break;
