@@ -47,6 +47,7 @@ public class ClientFrame
 	private String [] listOfFiles = null ;
 	private Socket clientSocket = null;
 	private ObjectOutputStream out = null;
+	private BufferedReader buffin = null;
 	private JFileChooser fc = new JFileChooser();
 	private ArrayList<Client> clients;
 
@@ -168,39 +169,60 @@ public class ClientFrame
 		panelServer.add(btnAddFile);
 
 		frame.setVisible(true);
-
 	}
 
-	private void addFileInList(String path)
+	private void addFileInList(String [] listOfFiles)
 	{
-		JLabel lblfileName = new JLabel(path);
-		panelListShared.add(lblfileName);
-
+		for (int i = 0; i < listOfFiles.length; i++) 
+		{
+			JLabel lblfileName = new JLabel(listOfFiles[i]);
+			panelListShared.add(lblfileName);
+		}
+		
 		panelSharedFiles.validate();
 		panelSharedFiles.repaint();
-
 	}
 
 	private void connect() throws IOException
 	{	
-		clientSocket = new Socket();
+		if (clientSocket == null)
+		{
+			clientSocket = new Socket();
 
-		ipServer = serverField.getText();
+			ipServer = serverField.getText();
 
-		InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
-		clientSocket.connect(serverSocket);
+			InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
+			clientSocket.connect(serverSocket);
 
-		out = new ObjectOutputStream(clientSocket.getOutputStream());
-
+			out = new ObjectOutputStream(clientSocket.getOutputStream());
+			buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		}
+		
 		login = loginField.getText();
 		password = passwordField.getText();
 		ipClient = clientSocket.getLocalAddress().getHostAddress();
 		listOfFiles = getListOfFiles();
 
 		client = new Client(login, password, ipClient, listOfFiles);
-
+		
 		out.writeObject(client);
+
+		String controle = buffin.readLine();
+
+		if(controle.equals("1"))
+		{
+			System.out.println("Login réussi");
+			addFileInList(client.getListOfFiles());
+			cardlayout.show(mainPanel, "panelServer");
+		}
+		else
+		{
+			frame.repaint();
+			frame.validate();
+		}
 	}
+
+
 
 	private String [] getListOfFiles()
 	{
@@ -215,8 +237,6 @@ public class ClientFrame
 		for (int i = 0; i < files.length; i++) 
 		{
 			files[i] = lst[i].getName();
-
-			addFileInList(files[i]);
 		}
 
 		return files;
@@ -229,23 +249,12 @@ public class ClientFrame
 		{
 			try 
 			{
-				for (Client client : clients) 
-				{
-					if(lblLogin.getText().equals(client.getName()))
-					{
-						System.out.println("Client deja enregistré");
-					}
-				}
-
 				connect();
 			} 
 			catch (IOException e1) 
 			{
 				e1.printStackTrace();
 			}
-
-			cardlayout.show(mainPanel, "panelServer");
-
 		}
 	}
 	class addFile implements ActionListener
@@ -264,6 +273,8 @@ public class ClientFrame
 			if (resultat == fc.APPROVE_OPTION) 
 			{
 				saveToDirectory(fc.getSelectedFile().getAbsolutePath());
+				panelListShared.repaint();
+				panelListShared.revalidate();
 			}
 		}
 	}
