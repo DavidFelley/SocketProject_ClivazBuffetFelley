@@ -4,6 +4,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -11,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.lang.invoke.SwitchPoint;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -34,6 +37,7 @@ public class ClientFrame
 	private String ipClient = "";
 	private String ipServer = "";
 	private String [] listOfFiles = null ;
+	private boolean exist;
 	private Socket clientSocket = null;
 	private ObjectOutputStream out = null;
 	private BufferedReader buffin = null;
@@ -50,8 +54,8 @@ public class ClientFrame
 	private JPanel mainPanel = new JPanel(cardlayout);
 	private JPanel panelServer;
 	private JLabel lblLogin;
-	private MessageBoxes messageBoxes = new MessageBoxes();
-	
+	private JLabel lblError;
+
 	/**
 	 * Create the application.
 	 */
@@ -121,7 +125,14 @@ public class ClientFrame
 		btnSignIn.setBackground(Color.RED);
 		btnSignIn.setForeground(Color.WHITE);
 		btnSignIn.setBounds(629, 528, 97, 25);
+		btnSignIn.addActionListener(new SignInClick());
 		panelLogin.add(btnSignIn);
+
+		lblError = new JLabel("",SwingConstants.CENTER);
+		lblError.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblError.setForeground(Color.RED);
+		lblError.setBounds(236, 458, 522, 22);
+		panelLogin.add(lblError);
 
 		panelServer = new JPanel();
 		mainPanel.add(panelServer, "panelServer");
@@ -164,7 +175,7 @@ public class ClientFrame
 			JLabel lblfileName = new JLabel(listOfFiles[i]);
 			panelListShared.add(lblfileName);
 		}
-		
+
 		panelSharedFiles.validate();
 		panelSharedFiles.repaint();
 	}
@@ -175,33 +186,48 @@ public class ClientFrame
 
 		out = new ObjectOutputStream(clientSocket.getOutputStream());
 		buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		
+
 		login = loginField.getText();
 		password = passwordField.getText();
 		ipClient = clientSocket.getLocalAddress().getHostAddress();
 		listOfFiles = getListOfFiles();
 
-		client = new Client(login, password, ipClient, listOfFiles);
-		
+		client = new Client(login, password, ipClient, listOfFiles, exist);
+
 		out.writeObject(client);
 
 		String controle = buffin.readLine();
 
-		if(controle.equals("1"))
+		controleConnection(controle);
+	}
+
+	private void controleConnection(String value)
+	{
+		switch (value) 
 		{
-			System.out.println("Login réussi");
+		case "0":
+			lblError.setText("Wrong user or password");
+			frame.repaint();
+			frame.validate();
+			break;
+
+		case "1":
 			addFileInList(client.getListOfFiles());
 			cardlayout.show(mainPanel, "panelServer");
-		}
-		else
-		{
-			messageBoxes.ShowError("Password or User Incorrect", "Error");
+			break;
+
+		case "2":
+			lblError.setText("User already exist");
+			frame.repaint();
+			frame.validate();
+			break;
+			
+		default : 
+			lblError.setText("Unknown Error please try again");
 			frame.repaint();
 			frame.validate();
 		}
 	}
-
-
 
 	private String [] getListOfFiles()
 	{
@@ -228,6 +254,7 @@ public class ClientFrame
 		{
 			try 
 			{
+				exist = true;
 				connect();
 			} 
 			catch (IOException e1) 
@@ -236,7 +263,24 @@ public class ClientFrame
 			}
 		}
 	}
-	
+
+	class SignInClick implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e) 
+		{
+			try 
+			{
+				exist = false;
+				connect();
+			} 
+			catch (IOException e1) 
+			{
+				e1.printStackTrace();
+			}
+		}
+	}
+
 	class addFile implements ActionListener
 	{
 		@Override
@@ -263,13 +307,13 @@ public class ClientFrame
 	{
 
 		try{
-			
+
 			File file = new File(path);
 			Path sourceDirectory = Paths.get(path);
-	        Path targetDirectory = Paths.get("C:\\SharedDocuments\\"+file.getName());
+			Path targetDirectory = Paths.get("C:\\SharedDocuments\\"+file.getName());
 
-	        //copy source to target using Files Class
-	        Files.copy(sourceDirectory, targetDirectory);
+			//copy source to target using Files Class
+			Files.copy(sourceDirectory, targetDirectory);
 
 		}catch(Exception e)
 		{

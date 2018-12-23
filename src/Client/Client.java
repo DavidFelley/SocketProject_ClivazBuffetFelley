@@ -8,13 +8,26 @@ public class Client implements Serializable
 	private String mdp;
 	private String ip;
 	private String [] listOfFiles;
+	private boolean exist;
 	
-	public Client(String name, String mdp, String ip, String [] listOffiles) 
+	public Client(String name, String mdp, String ip, String [] listOffiles, boolean exist) 
 	{
 		this.name = name;
 		this.mdp = mdp;
 		this.ip = ip;
 		this.listOfFiles = listOffiles;
+		this.exist = exist;
+	}
+	
+	public Client(String name, String mdp) 
+	{
+		this.name = name;
+		this.mdp = mdp;
+	}
+
+	public boolean isExist() 
+	{
+		return exist;
 	}
 
 	public String getName() 

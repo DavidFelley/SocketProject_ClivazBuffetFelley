@@ -6,21 +6,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+
+import Client.Client;
 
 
 public class Serialize 
 {
-	private String path;
+	private String path = "Client//client.zer";
+	private Client admin = new Client("Admin", "1234");
+	private ArrayList<Client> list = new ArrayList<>();
 
-	public Serialize(String path) 
+	public Serialize() 
 	{
 		super();
-		this.path = path;
 	}
 
 	public void serializeObject(Object o) 
 	{
-
 		try 
 		{
 			FileOutputStream fichier = new FileOutputStream(path);
@@ -36,14 +39,14 @@ public class Serialize
 	}
 
 	public Object deSerializeObject() 
-	{ 
+	{ 		
 		Object cs = null;
-		
+
 		try 
 		{
 			FileInputStream fichier = new FileInputStream(path);
 			ObjectInputStream ois = new ObjectInputStream(fichier);
-			cs=ois.readObject();
+			cs = ois.readObject();
 		}
 		catch (Exception e) 
 		{
@@ -55,20 +58,21 @@ public class Serialize
 
 	public void createFile()
 	{
-		File f = new File("Client//client.zer"); 
-
-		// tester si le parent (qui est un répertoire existe) 
-
-		File p = new File("Client"); 
+		File f = new File("Client\\client.zer");
 
 		try
 		{
-			// crée le rep 
-			if (!p.exists()) 
-				p.mkdirs(); 
+			if (!f.getParentFile().exists())
+				f.getParentFile().mkdir();
 
-			if (!f.exists())
+			if(!f.exists())
+			{
 				f.createNewFile();
+				list.add(admin);
+				serializeObject(list);
+			}
+
+			
 		}
 		catch (IOException e)
 		{

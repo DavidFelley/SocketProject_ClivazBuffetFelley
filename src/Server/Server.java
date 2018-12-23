@@ -9,9 +9,8 @@ public class Server
 {
 	private ServerFrame sf;
 	private Socket clientSocket = null;
-	private ArrayList<Client> clients= null;
-	private Serialize serialize = new Serialize("Client//client.zer");
-	private ArrayList<AccepteClient> clientsConnected;
+	private Serialize serialize = new Serialize();
+	private ArrayList<AccepteClient> clientsConnected = new ArrayList<>();
 
 	public Server() 
 	{
@@ -24,20 +23,14 @@ public class Server
 		//Initialise la frame
 		sf = new ServerFrame();
 		
-		//Affiche les users existants dans la frame server
-		sf.createLabel("User list : ");
-
-		clients = (ArrayList<Client>)(serialize.deSerializeObject());
-
-		for (Client client : clients)
-			sf.createLabel(client.getName());
-	
+		//cree les fichiers de sauvegarde utilisateurs si n'existent pas
+		serialize.createFile();
+		
 		ServerSocket mySkServer;
 
 		try 
 		{
-			//Warning : the backlog value 2nd parameter is handled by the implementation
-			mySkServer = new ServerSocket(45000,10);
+			mySkServer = new ServerSocket(45000,5);
 
 			//wait for a client connection
 			while(true)
@@ -45,7 +38,7 @@ public class Server
 				clientSocket = mySkServer.accept();
 				System.out.println("connection request received");
 
-				Thread t = new AccepteClient(clientSocket, clientsConnected);
+				Thread t = new AccepteClient(clientSocket, clientsConnected, sf, serialize);
 
 				//starting the thread
 				t.start();
