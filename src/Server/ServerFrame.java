@@ -23,14 +23,13 @@ import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.awt.Choice;
 
 public class ServerFrame {
 
 	private JFrame frmServer;
-	private JPanel panelInfoServer = new JPanel();
-	private JPanel panelListFiles;
-
+	private JPanel panelInfoServer = new JPanel(); 
 	/**
 	 * Create the application.
 	 */
@@ -60,30 +59,13 @@ public class ServerFrame {
 		btnPower.setBackground(Color.RED);
 		btnPower.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
 		
-		btnPower.addActionListener(new ActionListener() 
-		{
-			public void actionPerformed(ActionEvent arg0) 
-			{
-
-				System.exit(0);
-			}
-		});
+		btnPower.addActionListener(new powerOff());
 		btnPower.setBounds(12, 587, 128, 57);
 		panelServer.add(btnPower);
-
-
-		JLabel lblChat = new JLabel("CHAT");
-		lblChat.setForeground(Color.RED);
-		lblChat.setBackground(Color.WHITE);
-		lblChat.setBounds(962, 422, 56, 16);
-		panelServer.add(lblChat);
 		
 		panelInfoServer.setBackground(Color.GRAY);
-
 		panelInfoServer.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
-
 		panelInfoServer.setBounds(755, 35, 315, 372);
-
 		panelInfoServer.setLayout(new BoxLayout(panelInfoServer, BoxLayout.Y_AXIS));
 
 		JLabel lblServer = new JLabel("SERVER");
@@ -91,34 +73,12 @@ public class ServerFrame {
 		lblServer.setBounds(948, 0, 59, 29);
 		panelServer.add(lblServer);
 
-
-
-		JPanel panelChat = new JPanel();
-		panelChat.setBackground(Color.GRAY);
-		panelChat.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
-		panelChat.setBounds(831, 451, 315, 193);
-		panelServer.add(panelChat);
-
-		panelListFiles = new JPanel();
-		panelListFiles.setBackground(Color.GRAY);
-		panelListFiles.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
-		panelListFiles.setBounds(30, 39, 295, 372);
-		panelServer.add(panelListFiles);
-		panelListFiles.setLayout(new BorderLayout(0, 0));
-
-		JLabel LabelListOfFiles = new JLabel("LIST OF FILES");
-		LabelListOfFiles.setForeground(Color.RED);
-		LabelListOfFiles.setBounds(130, 3, 90, 23);
-		panelServer.add(LabelListOfFiles);
-
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setBounds(822, 42, 324, 304);
 		scrollPane.setViewportView(panelInfoServer);
 		panelServer.add(scrollPane);
 
-		frmServer.repaint();
-		frmServer.validate();
 		frmServer.setVisible(true);
 	}
 
@@ -130,31 +90,13 @@ public class ServerFrame {
 		panelInfoServer.validate();
 		panelInfoServer.repaint();
 	}
-
 	
-
-	private static void addPopup(Component component, final JPopupMenu popup)
+	class powerOff implements ActionListener
 	{
-		component.addMouseListener(new MouseAdapter()
+		@Override
+		public void actionPerformed(ActionEvent arg0) 
 		{
-			public void mousePressed(MouseEvent e)
-			{
-				if (e.isPopupTrigger())
-				{
-					showMenu(e);
-				}
-			}
-			public void mouseReleased(MouseEvent e)
-			{
-				if (e.isPopupTrigger())
-				{
-					showMenu(e);
-				}
-			}
-			private void showMenu(MouseEvent e) 
-			{
-				popup.show(e.getComponent(), e.getX(), e.getY());
-			}
-		});
+			System.exit(0);
+		}
 	}
 }

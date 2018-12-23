@@ -4,24 +4,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
-
-import Server.AccepteClient;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.MessageDigestSpi;
-import java.util.ArrayList;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
@@ -29,15 +23,7 @@ import javax.swing.JFileChooser;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
-import javax.swing.JScrollPane;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
-
-import java.awt.Button;
-import java.awt.GridLayout;
-import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollBar;
 
 public class ClientFrame 
 {
@@ -52,8 +38,6 @@ public class ClientFrame
 	private ObjectOutputStream out = null;
 	private BufferedReader buffin = null;
 	private JFileChooser fc = new JFileChooser();
-	private ArrayList<Client> clients;
-
 
 	//Variables graphiques
 	private JFrame frame;
@@ -73,8 +57,6 @@ public class ClientFrame
 	 */
 	public ClientFrame() 
 	{
-		clients = AccepteClient.list;
-
 		initialize();
 	}
 
@@ -189,18 +171,10 @@ public class ClientFrame
 
 	private void connect() throws IOException
 	{	
-		if (clientSocket == null)
-		{
-			clientSocket = new Socket();
+		clientSocket = new Socket(ipServer = serverField.getText(), 45000);
 
-			ipServer = serverField.getText();
-
-			InetSocketAddress serverSocket = new InetSocketAddress(ipServer, 45000);
-			clientSocket.connect(serverSocket);
-
-			out = new ObjectOutputStream(clientSocket.getOutputStream());
-			buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		}
+		out = new ObjectOutputStream(clientSocket.getOutputStream());
+		buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		
 		login = loginField.getText();
 		password = passwordField.getText();
@@ -262,6 +236,7 @@ public class ClientFrame
 			}
 		}
 	}
+	
 	class addFile implements ActionListener
 	{
 		@Override
@@ -279,7 +254,6 @@ public class ClientFrame
 			{
 				saveToDirectory(fc.getSelectedFile().getAbsolutePath());
 				panelSharedFiles.add(panelListShared, BorderLayout.CENTER);
-
 			}
 		}
 	}
@@ -289,11 +263,16 @@ public class ClientFrame
 	{
 
 		try{
+			
 			File file = new File(path);
+			Path sourceDirectory = Paths.get(path);
+	        Path targetDirectory = Paths.get("C:\\SharedDocuments\\"+file.getName());
 
-			if(file.renameTo(new File("C:\\SharedDocuments\\" + file.getName())));
+	        //copy source to target using Files Class
+	        Files.copy(sourceDirectory, targetDirectory);
 
-		}catch(Exception e){
+		}catch(Exception e)
+		{
 			e.printStackTrace();
 		}
 	}

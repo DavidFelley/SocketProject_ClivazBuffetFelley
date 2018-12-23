@@ -1,110 +1,60 @@
 package Server;
-import java.awt.Frame;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.net.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import java.io.IOException;
+import java.net.*;
+import java.util.ArrayList;
 import Client.Client;
 
-public class Server  {
-
+public class Server  
+{
+	private ServerFrame sf;
 	private Socket clientSocket = null;
-	private BufferedWriter write = null;
-	private PrintWriter write2 = null;
 	private ArrayList<Client> clients= null;
-	
-	Serialize serialize = new Serialize("Client//client.zer");
-	ServerFrame frame = new ServerFrame();
+	private Serialize serialize = new Serialize("Client//client.zer");
+	private ArrayList<AccepteClient> clientsConnected;
 
-
-	@SuppressWarnings("unchecked")
 	public Server() 
 	{
-		frame.createLabel("User list : ");
-		
-		
+		launch();
+	}
 
-		clients=(ArrayList<Client>)(serialize.deSerializeObject());
-		for (Client client : clients) 
-		{
-			frame.createLabel(client.getName()+" "+client.getMdp());
-		}
+	@SuppressWarnings("unchecked")
+	private void launch() 
+	{
+		//Initialise la frame
+		sf = new ServerFrame();
 		
-		InetAddress localAddress = null;
+		//Affiche les users existants dans la frame server
+		sf.createLabel("User list : ");
+
+		clients = (ArrayList<Client>)(serialize.deSerializeObject());
+
+		for (Client client : clients)
+			sf.createLabel(client.getName());
+	
 		ServerSocket mySkServer;
-		String interfaceName = "eth1";
 
+		try 
+		{
+			//Warning : the backlog value 2nd parameter is handled by the implementation
+			mySkServer = new ServerSocket(45000,10);
 
-		int ClientNo = 1;
-
-		try {
-			serialize.createFile();
-			
-			NetworkInterface ni = NetworkInterface.getByName(interfaceName);
-			Enumeration<InetAddress> inetAddresses =  ni.getInetAddresses();
-			while(inetAddresses.hasMoreElements()) {
-				InetAddress ia = inetAddresses.nextElement();
-
-				if(!ia.isLinkLocalAddress()) {
-					if(!ia.isLoopbackAddress()) {
-						System.out.println(ni.getName() + "->IP: " + ia.getHostAddress());
-						localAddress = ia;
-					}
-				}   
-			}
-
-			//Warning : the backlog value (2nd parameter is handled by the implementation
-			mySkServer = new ServerSocket(45000,10,localAddress);
-
-						
 			//wait for a client connection
 			while(true)
 			{
 				clientSocket = mySkServer.accept();
+				System.out.println("connection request received");
 
-
-				Thread t = new Thread(new AccepteClient(clientSocket, frame, clients));
-
-
-
+				Thread t = new AccepteClient(clientSocket, clientsConnected);
 
 				//starting the thread
 				t.start();
-
-
-
-
 			}
-
-
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
 		} 
 
-
-
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		} 
 	}
-
-	
-
 }
