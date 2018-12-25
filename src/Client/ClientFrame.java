@@ -5,20 +5,20 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.invoke.SwitchPoint;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
@@ -26,7 +26,7 @@ import javax.swing.JFileChooser;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
-import javax.swing.JList;
+import javax.swing.JComboBox;
 
 public class ClientFrame 
 {
@@ -40,8 +40,10 @@ public class ClientFrame
 	private boolean exist;
 	private Socket clientSocket = null;
 	private ObjectOutputStream out = null;
+	private ObjectInputStream ois = null;
 	private BufferedReader buffin = null;
 	private JFileChooser fc = new JFileChooser();
+	private ArrayList<Client> listOfClients = new ArrayList<>();
 
 	//Variables graphiques
 	private JFrame frame;
@@ -55,6 +57,7 @@ public class ClientFrame
 	private JPanel panelServer;
 	private JLabel lblLogin;
 	private JLabel lblError;
+	private JComboBox cbOnlineUser;
 
 	/**
 	 * Create the application.
@@ -140,21 +143,25 @@ public class ClientFrame
 		panelServer.setLayout(null);
 
 		JPanel panelFiles = new JPanel();
-		panelFiles.setBounds(0, 0, 280, 420);
+		panelFiles.setBounds(12, 13, 251, 420);
 		panelServer.add(panelFiles);
+		panelFiles.setLayout(new BorderLayout(0, 0));
 
-		JList listSharedFiles = new JList();
-		panelFiles.add(listSharedFiles);
+		JPanel panelListFiles = new JPanel();
+		panelFiles.add(panelListFiles, BorderLayout.CENTER);
+
+		cbOnlineUser = new JComboBox<String>();
+		panelFiles.add(cbOnlineUser, BorderLayout.NORTH);
 
 		panelSharedFiles = new JPanel();
-		panelSharedFiles.setBounds(703, 0, 291, 420);
+		panelSharedFiles.setBounds(731, 13, 251, 420);
 		panelServer.add(panelSharedFiles);
 		panelSharedFiles.setLayout(new BorderLayout(10, 0));
 
 		JPanel panel = new JPanel();
 		panelSharedFiles.add(panel, BorderLayout.NORTH);
 
-		JLabel lblSharedFiles = new JLabel("Shared Files");
+		JLabel lblSharedFiles = new JLabel("My Files");
 		panel.add(lblSharedFiles);
 
 		panelListShared= new JPanel();
@@ -162,8 +169,12 @@ public class ClientFrame
 
 		JButton btnAddFile = new JButton("Add File");
 		btnAddFile.addActionListener(new addFile());
-		btnAddFile.setBounds(703, 446, 97, 25);
+		btnAddFile.setBounds(731, 448, 97, 25);
 		panelServer.add(btnAddFile);
+
+		JButton btnDownload = new JButton("Download");
+		btnDownload.setBounds(12, 448, 97, 25);
+		panelServer.add(btnDownload);
 
 		frame.setVisible(true);
 	}
@@ -182,7 +193,8 @@ public class ClientFrame
 
 	private void connect() throws IOException
 	{	
-		clientSocket = new Socket(ipServer = serverField.getText(), 45000);
+		ipServer = serverField.getText();
+		clientSocket = new Socket(ipServer, 45000);
 
 		out = new ObjectOutputStream(clientSocket.getOutputStream());
 		buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -197,10 +209,28 @@ public class ClientFrame
 		out.writeObject(client);
 
 		String controle = buffin.readLine();
-
+		
 		controleConnection(controle);
+
 	}
 
+	//CETTE METHODE DOIT PERMETTRE AU CLIENT D'ECOUTER EN PERMANENCE LE SERVEUR POUR SAVOIR SI DE NOUVELLES PERSONNES SONT CONNECTEES
+	private void listenServer()
+	{
+		while(true)
+		{
+			try 
+			{
+				System.out.println(buffin.readLine());
+			} 
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	private void controleConnection(String value)
 	{
 		switch (value) 
@@ -209,19 +239,17 @@ public class ClientFrame
 			lblError.setText("Wrong user or password");
 			frame.repaint();
 			frame.validate();
-			break;
 
 		case "1":
 			addFileInList(client.getListOfFiles());
 			cardlayout.show(mainPanel, "panelServer");
-			break;
+			listenServer();
 
 		case "2":
 			lblError.setText("User already exist");
 			frame.repaint();
 			frame.validate();
-			break;
-			
+
 		default : 
 			lblError.setText("Unknown Error please try again");
 			frame.repaint();
@@ -302,12 +330,10 @@ public class ClientFrame
 		}
 	}
 
-
 	private void saveToDirectory(String path) 
 	{
-
-		try{
-
+		try
+		{
 			File file = new File(path);
 			Path sourceDirectory = Paths.get(path);
 			Path targetDirectory = Paths.get("C:\\SharedDocuments\\"+file.getName());
@@ -315,7 +341,8 @@ public class ClientFrame
 			//copy source to target using Files Class
 			Files.copy(sourceDirectory, targetDirectory);
 
-		}catch(Exception e)
+		}
+		catch(Exception e)
 		{
 			e.printStackTrace();
 		}

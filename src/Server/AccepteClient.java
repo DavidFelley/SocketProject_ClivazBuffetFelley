@@ -2,6 +2,7 @@ package Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.*;
 import java.util.ArrayList;
@@ -17,15 +18,14 @@ public class AccepteClient extends Thread
 
 	//Envoie d'info pour le client
 	private PrintWriter validate = null;
-	private ObjectInputStream in = null;
+	private ObjectInputStream ois = null;
+	private ObjectOutputStream oos = null;
 	private String validation = "";
-	private ArrayList<AccepteClient> clientsConnected;
 
 	//Constructor
 	public AccepteClient (Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize)
 	{
 		this.clientSocketOnServer = clientSocketOnServer;
-		this.clientsConnected = clientsConnected;
 		this.sf = sf;
 		this.serialize = serialize;
 	}
@@ -37,9 +37,9 @@ public class AccepteClient extends Thread
 		try 
 		{
 			validate = new PrintWriter(clientSocketOnServer.getOutputStream());
-			in = new ObjectInputStream(clientSocketOnServer.getInputStream());
+			ois = new ObjectInputStream(clientSocketOnServer.getInputStream());
 
-			client = (Client) in.readObject();
+			client = (Client) ois.readObject();
 			
 			list = (ArrayList<Client>)(serialize.deSerializeObject());
 
@@ -87,25 +87,20 @@ public class AccepteClient extends Thread
 				{
 					Client newClient = new Client(client.getName(), client.getMdp());
 					list.add(newClient);
+					serialize.serializeObject(list);
 					validation = "1";
 				}
-			
 			}
 			
-			serialize.serializeObject(list);
 			validate.println(validation);
 			validate.flush();
 
 			//Si le client est validé
 			if (validation.equals("1"))
 			{
-				//On l'ajoute à la liste des threads actifs
-				clientsConnected.add(this);
-				sf.createLabel(client.getName()+" is connected");
-				while(true)
-				{
-					//Le server écoute en permanence
-				}
+				
+				//ICI ON DOIT DONNER AU CLIENT QUI VIENT DE SE CONNECTER LA LISTE DES CLIENTS DEJA CO
+				//+ ON DOIT DONNER AUX CLIENTS DEJA CO LE NOUVEAU CONNECTE
 			}
 			else
 			{
