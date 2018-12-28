@@ -5,8 +5,12 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.text.DefaultCaret;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +30,12 @@ import javax.swing.JFileChooser;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
+import java.util.List;
 import javax.swing.JComboBox;
+import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
 
-public class ClientFrame 
+public class ClientFrame
 {
 	//Variables of connection
 	private Client client = null;
@@ -58,11 +65,16 @@ public class ClientFrame
 	private JLabel lblLogin;
 	private JLabel lblError;
 	private JComboBox cbOnlineUser;
+	private JTextField txtFMsgSend;
+	private JPanel panelListFiles;
+	private JScrollPane scrollChat;
+	private JTextArea txtAreaChat;
+
 
 	/**
 	 * Create the application.
 	 */
-	public ClientFrame() 
+	public ClientFrame()
 	{
 		initialize();
 	}
@@ -70,7 +82,7 @@ public class ClientFrame
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() 
+	private void initialize()
 	{
 		frame = new JFrame();
 		frame.setResizable(false);
@@ -147,10 +159,11 @@ public class ClientFrame
 		panelServer.add(panelFiles);
 		panelFiles.setLayout(new BorderLayout(0, 0));
 
-		JPanel panelListFiles = new JPanel();
+		panelListFiles = new JPanel();
 		panelFiles.add(panelListFiles, BorderLayout.CENTER);
 
 		cbOnlineUser = new JComboBox<String>();
+		cbOnlineUser.addActionListener(new SelectionChanged());
 		panelFiles.add(cbOnlineUser, BorderLayout.NORTH);
 
 		panelSharedFiles = new JPanel();
@@ -176,12 +189,36 @@ public class ClientFrame
 		btnDownload.setBounds(12, 448, 97, 25);
 		panelServer.add(btnDownload);
 
+		JButton btnSend = new JButton("New button");
+		btnSend.addActionListener(new sendMessage());
+		btnSend.setBounds(632, 449, 89, 23);
+		panelServer.add(btnSend);
+
+		txtFMsgSend = new JTextField();
+		txtFMsgSend.setBounds(272, 448, 350, 22);
+		panelServer.add(txtFMsgSend);
+		txtFMsgSend.setColumns(10);
+		
+		scrollChat = new JScrollPane();
+		scrollChat.setBounds(273, 13, 449, 420);
+		panelServer.add(scrollChat);
+		
+		txtAreaChat = new JTextArea();
+		scrollChat.setViewportView(txtAreaChat);
+
+		serverField.setText("192.168.43.242");
+		loginField.setText("loan");
+		passwordField.setText("1234");
+
+		DefaultCaret caret = (DefaultCaret)txtAreaChat.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		
 		frame.setVisible(true);
 	}
 
 	private void addFileInList(String [] listOfFiles)
 	{
-		for (int i = 0; i < listOfFiles.length; i++) 
+		for (int i = 0; i < listOfFiles.length; i++)
 		{
 			JLabel lblfileName = new JLabel(listOfFiles[i]);
 			panelListShared.add(lblfileName);
@@ -192,10 +229,10 @@ public class ClientFrame
 	}
 
 	private void connect() throws IOException
-	{	
+	{
 		ipServer = serverField.getText();
 		clientSocket = new Socket(ipServer, 45000);
-
+		ois = new ObjectInputStream(clientSocket.getInputStream());
 		out = new ObjectOutputStream(clientSocket.getOutputStream());
 		buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
@@ -207,9 +244,7 @@ public class ClientFrame
 		client = new Client(login, password, ipClient, listOfFiles, exist);
 
 		out.writeObject(client);
-
-		String controle = buffin.readLine();
-		
+		int controle = ois.readInt();
 		controleConnection(controle);
 
 	}
@@ -217,43 +252,63 @@ public class ClientFrame
 	//CETTE METHODE DOIT PERMETTRE AU CLIENT D'ECOUTER EN PERMANENCE LE SERVEUR POUR SAVOIR SI DE NOUVELLES PERSONNES SONT CONNECTEES
 	private void listenServer()
 	{
-		while(true)
-		{
-			try 
-			{
-				System.out.println(buffin.readLine());
-			} 
-			catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						Object o = ois.readObject();
+						if(o instanceof Message) {
+							Message m = (Message)o;
+							String sender = m.getClient().getName().equals(client.getName()) ? "Me" : m.getClient().getName();
+							txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
+						}
+
+						if(o instanceof ArrayList){
+							if(((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client){
+								listOfClients = (ArrayList<Client>)o;
+								if(cbOnlineUser.getItemCount() >=1)
+									cbOnlineUser.removeAllItems();
+								for (Client thisClient : listOfClients) {
+									cbOnlineUser.addItem(thisClient);
+								}
+							}
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-		}
+		}).start();
 	}
-	
-	private void controleConnection(String value)
+
+	private void controleConnection(int value)
 	{
-		switch (value) 
+		switch (value)
 		{
-		case "0":
-			lblError.setText("Wrong user or password");
-			frame.repaint();
-			frame.validate();
+			case 0:
+				lblError.setText("Wrong user or password");
+				frame.repaint();
+				frame.validate();
+				break;
+			case 1:
+				addFileInList(client.getListOfFiles());
+				cardlayout.show(mainPanel, "panelServer");
+				listenServer();
+				break;
 
-		case "1":
-			addFileInList(client.getListOfFiles());
-			cardlayout.show(mainPanel, "panelServer");
-			listenServer();
+			case 2:
+				lblError.setText("User already exist");
+				frame.repaint();
+				frame.validate();
+				break;
 
-		case "2":
-			lblError.setText("User already exist");
-			frame.repaint();
-			frame.validate();
-
-		default : 
-			lblError.setText("Unknown Error please try again");
-			frame.repaint();
-			frame.validate();
+			default :
+				lblError.setText("Unknown Error please try again");
+				frame.repaint();
+				frame.validate();
 		}
 	}
 
@@ -267,7 +322,7 @@ public class ClientFrame
 		String [] files = new String [directory.list().length];
 		File [] lst = directory.listFiles();
 
-		for (int i = 0; i < files.length; i++) 
+		for (int i = 0; i < files.length; i++)
 		{
 			files[i] = lst[i].getName();
 		}
@@ -278,14 +333,14 @@ public class ClientFrame
 	class LoginClick implements ActionListener
 	{
 		@Override
-		public void actionPerformed(ActionEvent e) 
+		public void actionPerformed(ActionEvent e)
 		{
-			try 
+			try
 			{
 				exist = true;
 				connect();
-			} 
-			catch (IOException e1) 
+			}
+			catch (IOException e1)
 			{
 				e1.printStackTrace();
 			}
@@ -295,14 +350,14 @@ public class ClientFrame
 	class SignInClick implements ActionListener
 	{
 		@Override
-		public void actionPerformed(ActionEvent e) 
+		public void actionPerformed(ActionEvent e)
 		{
-			try 
+			try
 			{
 				exist = false;
 				connect();
-			} 
-			catch (IOException e1) 
+			}
+			catch (IOException e1)
 			{
 				e1.printStackTrace();
 			}
@@ -312,7 +367,7 @@ public class ClientFrame
 	class addFile implements ActionListener
 	{
 		@Override
-		public void actionPerformed(ActionEvent e) 
+		public void actionPerformed(ActionEvent e)
 		{
 			int resultat = fc.showOpenDialog(panelServer);
 
@@ -322,7 +377,7 @@ public class ClientFrame
 				return;
 			}
 
-			if (resultat == fc.APPROVE_OPTION) 
+			if (resultat == fc.APPROVE_OPTION)
 			{
 				saveToDirectory(fc.getSelectedFile().getAbsolutePath());
 				panelSharedFiles.add(panelListShared, BorderLayout.CENTER);
@@ -330,7 +385,7 @@ public class ClientFrame
 		}
 	}
 
-	private void saveToDirectory(String path) 
+	private void saveToDirectory(String path)
 	{
 		try
 		{
@@ -345,6 +400,38 @@ public class ClientFrame
 		catch(Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+
+	private class sendMessage implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				out.writeObject(new Message(txtFMsgSend.getText(), client));
+				out.flush();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	private class SelectionChanged implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			panelListFiles.removeAll();
+			if(cbOnlineUser.getItemCount()> 0){
+				for (String myFile : listOfClients.get(cbOnlineUser.getSelectedIndex()).getListOfFiles()) {
+					JLabel theLabel = new JLabel(myFile);
+					theLabel.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							// ICI ON TROUVE COMMENT ENVOYER FICHIER A L'AUTRE GUSSE
+						}
+					});
+					panelListFiles.add(theLabel);
+				}
+				System.out.println(listOfClients.get(cbOnlineUser.getSelectedIndex()).getListOfFiles());
+			}
 		}
 	}
 }

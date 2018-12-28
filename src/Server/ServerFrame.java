@@ -44,6 +44,7 @@ public class ServerFrame {
 	private void initialize() 
 	{
 		frmServer = new JFrame();
+		frmServer.setResizable(false);
 		frmServer.setTitle("SERVER");
 		frmServer.setForeground(Color.GRAY);
 		frmServer.setBounds(100, 100, 1250, 703);
@@ -60,13 +61,19 @@ public class ServerFrame {
 		btnPower.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
 		
 		btnPower.addActionListener(new powerOff());
-		btnPower.setBounds(552, 587, 128, 57);
+		btnPower.setBounds(512, 587, 128, 57);
 		panelServer.add(btnPower);
-		panelServer.add(panelInfoServer);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(89, 11, 1046, 539);
+		scrollPane.setViewportView(panelInfoServer);
+		scrollPane.setVisible(true);
+		panelServer.add(scrollPane);
+		
 		
 		panelInfoServer.setBackground(Color.GRAY);
 		panelInfoServer.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
-		panelInfoServer.setBounds(91, 24, 1050, 543);
+		panelInfoServer.setBounds(36, 11, 1050, 543);
 		panelInfoServer.setLayout(new BoxLayout(panelInfoServer, BoxLayout.Y_AXIS));
 
 		frmServer.setVisible(true);

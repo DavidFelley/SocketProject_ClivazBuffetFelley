@@ -37,7 +37,7 @@ public class Server
 			{
 				clientSocket = mySkServer.accept();
 				System.out.println("connection request received");
-
+				
 				Thread t = new AccepteClient(clientSocket, clientsConnected, sf, serialize);
 
 				//starting the thread

@@ -1,26 +1,34 @@
 package Server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.*;
 import java.util.ArrayList;
-import Client.Client;
+import java.util.Iterator;
 
-public class AccepteClient extends Thread 
+import Client.Client;
+import Client.CloseMyConnection;
+import Client.Message;
+
+public class AccepteClient extends Thread
 {
 	private Serialize serialize;
 	private ServerFrame sf = null;
 	private Socket clientSocketOnServer = null;
+	private ArrayList<AccepteClient> clientsConnected = null;
 	private Client client = null;
-	private ArrayList<Client> list = null;
+	private ArrayList<Client> listOfClient = null;
+	private BufferedReader buffin = null;
 
 	//Envoie d'info pour le client
 	private PrintWriter validate = null;
 	private ObjectInputStream ois = null;
 	private ObjectOutputStream oos = null;
-	private String validation = "";
+	private int validation = -1;
 
 	//Constructor
 	public AccepteClient (Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize)
@@ -28,32 +36,33 @@ public class AccepteClient extends Thread
 		this.clientSocketOnServer = clientSocketOnServer;
 		this.sf = sf;
 		this.serialize = serialize;
+		this.clientsConnected = clientsConnected;
 	}
 
 	//overwrite the thread run()
 	@SuppressWarnings({ "unchecked", "deprecation" })
-	public void run() 
+	public void run()
 	{
-		try 
+		try
 		{
+			oos = new ObjectOutputStream(clientSocketOnServer.getOutputStream());
 			validate = new PrintWriter(clientSocketOnServer.getOutputStream());
 			ois = new ObjectInputStream(clientSocketOnServer.getInputStream());
-
 			client = (Client) ois.readObject();
-			
-			list = (ArrayList<Client>)(serialize.deSerializeObject());
 
-			if (client.isExist()) 
+			listOfClient = (ArrayList<Client>)(serialize.deSerializeObject());
+
+			if (client.isExist())
 			{
 				//Controle si le client existe deja
-				for (Client clientRegistered : list)
+				for (Client clientRegistered : listOfClient)
 				{
 					if(clientRegistered.getName().equalsIgnoreCase(client.getName()))
 					{
 						if(clientRegistered.getMdp().equals(client.getMdp()))
 						{
 							System.out.println("Mot de passe correct");
-							validation = "1";
+							validation = 1;
 
 							//Affiche la confirmation du password dans le server
 							sf.createLabel("Password Validate");
@@ -64,41 +73,69 @@ public class AccepteClient extends Thread
 							//Affiche l'échec du password
 							sf.createLabel("False Password");
 							System.out.println("Mot de passe incorrect");
-							validation = "0";
+							validation = 0;
 							break;
 						}
 					}
-					validation = "0";
+					validation = 0;
 				}
 			}
 			else
 			{
 				//Controle si le client existe deja
-				for (Client clientRegistered : list) 
+				for (Client clientRegistered : listOfClient)
 				{
 					if(clientRegistered.getName().equalsIgnoreCase(client.getName()))
 					{
-						validation = "2";
+						validation = 2;
 						break;
 					}
 				}
-				
-				if (!validation.equals("2")) 
+
+				if (validation != 2)
 				{
 					Client newClient = new Client(client.getName(), client.getMdp());
-					list.add(newClient);
-					serialize.serializeObject(list);
-					validation = "1";
+					listOfClient.add(newClient);
+					serialize.serializeObject(listOfClient);
+					validation = 1;
 				}
 			}
+
+			oos.writeInt(1);
+			oos.flush();
 			
-			validate.println(validation);
-			validate.flush();
+
 
 			//Si le client est validé
-			if (validation.equals("1"))
+			if (validation== 1)
 			{
-				
+				this.clientsConnected.add(this);
+				updateClientList();
+				try {
+					Object o;
+					while((o = ois.readObject())!=null) {
+						if(o instanceof Message) {
+							Message m = (Message)o;
+							sf.createLabel(m.getClient().getName() + " : " + m.getMessage());
+							for (AccepteClient accepteClient : clientsConnected) {
+								accepteClient.oos.writeObject(m);
+								accepteClient.oos.flush();
+							}
+							
+						}
+						if(o instanceof CloseMyConnection) {
+							CloseMyConnection cmc = (CloseMyConnection)o;
+							if(client.getName().equals(cmc.getClient().getName())) {
+								System.out.println("je quitte tout");
+							}
+						}
+					}
+				}
+				catch(SocketException e) {
+					clientsConnected.remove(this);
+					updateClientList();
+					System.out.println("Client disconnected");
+				}
 				//ICI ON DOIT DONNER AU CLIENT QUI VIENT DE SE CONNECTER LA LISTE DES CLIENTS DEJA CO
 				//+ ON DOIT DONNER AUX CLIENTS DEJA CO LE NOUVEAU CONNECTE
 			}
@@ -109,19 +146,32 @@ public class AccepteClient extends Thread
 				this.stop();
 			}
 		}
-		catch (IOException e) 
+		catch (IOException e)
 		{
 			e.printStackTrace();
-		} 
-		catch (ClassNotFoundException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		catch (InterruptedException e) 
+		}
+		catch (ClassNotFoundException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void updateClientList() throws IOException {
+
+		ArrayList<Client> alClient = new ArrayList<Client>();
+		for (AccepteClient accepteClient : clientsConnected) {
+			alClient.add(accepteClient.client);
+		}
+		for (AccepteClient accepteClient : clientsConnected) {
+			accepteClient.oos.writeObject(alClient);
+			accepteClient.oos.flush();
+		}
+		
 	}
 }
