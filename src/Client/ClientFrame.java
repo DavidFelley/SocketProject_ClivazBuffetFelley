@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import java.awt.Font;
@@ -34,6 +35,7 @@ import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+import javax.swing.JList;
 
 public class ClientFrame
 {
@@ -66,9 +68,10 @@ public class ClientFrame
 	private JLabel lblError;
 	private JComboBox jcbobxForClient;
 	private JTextField txtFMsgSend;
-	private JPanel pnlFileListes;
 	private JScrollPane scrollChat;
 	private JTextArea txtAreaChat;
+	private DefaultListModel<String> model;
+	private JList JlstFile;
 
 
 	/**
@@ -159,12 +162,15 @@ public class ClientFrame
 		pnlServer.add(panelFiles);
 		panelFiles.setLayout(new BorderLayout(0, 0));
 
-		pnlFileListes = new JPanel();
-		panelFiles.add(pnlFileListes, BorderLayout.CENTER);
-
 		jcbobxForClient = new JComboBox<String>();
 		jcbobxForClient.addActionListener(new SelectionChanged());
 		panelFiles.add(jcbobxForClient, BorderLayout.NORTH);
+		
+		model = new DefaultListModel<>();
+		
+		
+		JlstFile = new JList(model);
+		panelFiles.add(JlstFile, BorderLayout.CENTER);
 
 		pnlSharedFiles = new JPanel();
 		pnlSharedFiles.setBounds(731, 13, 251, 420);
@@ -186,6 +192,7 @@ public class ClientFrame
 		pnlServer.add(btnAddFile);
 
 		JButton btnDownload = new JButton("Download");
+		btnDownload.addActionListener(new DownloadButtonClick());
 		btnDownload.setBounds(12, 448, 97, 25);
 		pnlServer.add(btnDownload);
 
@@ -256,19 +263,27 @@ public class ClientFrame
 
 	}
 
-	//cette methode permet l'écoute 
-	private void listenServer()
+	/*
+	 * mise a jour de l'interface graphique du client par rapport au changement
+	 * nouveau message , nouveau liste de fichiers , nouveau client connecté , ...
+	 */
+	private void listenServer() 
 	{
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (true) {
-					try {
+				while (true) 
+				{
+				try {
 						Object o = inStream.readObject();
-						if(o instanceof Message) {
+						/*
+						 * si l'objet mis a jour est un message
+						 * alors on met a jout le texte area
+						 */
+						if(o instanceof Message) 
+						{
 							Message m = (Message)o;
-							
-						//lors de l'envoie du message , si c'est nous qui envoyont le message nous voyons "Me" a la place de notre pseudo
+							//lors de l'envoie du message , si c'est nous qui envoyont le message nous voyons "Me" a la place de notre pseudo
 							if (m.getClient().getName().equals(myClient.getName())) 
 							{
 								String sender =  "Me";
@@ -279,19 +294,28 @@ public class ClientFrame
 								String sender 	=  m.getClient().getName();
 								txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
 							}
-							
-						
-							
 						}
-
-						//liste des fichiers client (Loan)
-						if(o instanceof ArrayList){
-							if(((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client){
+						
+						/*
+						 * si l'objet mis a jour est un ArrayList
+						 *liste des fichiers client (Loan)
+						 */
+						
+						if(o instanceof ArrayList)
+						{
+							if(((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client)
+							{
 								listOfClients = (ArrayList<Client>)o;
 								if(jcbobxForClient.getItemCount() >=1)
+								{
 									jcbobxForClient.removeAllItems();
-								for (Client thisClient : listOfClients) {
+								}
+								for (Client thisClient : listOfClients) 
+								{
 									jcbobxForClient.addItem(thisClient);
+									System.out.println(thisClient.getName());
+									System.out.println(listOfClients);
+									
 								}
 							}
 						}
@@ -435,24 +459,50 @@ public class ClientFrame
 			}
 		}
 	}
-
-	private class SelectionChanged implements ActionListener {
+	private class SelectionChanged implements ActionListener 
+	{
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			pnlFileListes.removeAll();
-			if(jcbobxForClient.getItemCount()> 0){
-				for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) {
-					JLabel theLabel = new JLabel(myFile);
-					theLabel.addMouseListener(new MouseAdapter() {
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							// ICI ON TROUVE COMMENT ENVOYER FICHIER A L'AUTRE GUSSE
-						}
-					});
-					pnlFileListes.add(theLabel);
+		public void actionPerformed(ActionEvent e) 
+		{
+			System.out.println("avant remove" + listOfFiles);
+			model.removeAllElements(); //enlève graphiquemeent
+			//enlèveve tout un par una
+			
+//			for (int j = 0; j < listOfFiles.length; j++) {
+//				pnlFileListes.remove(j);
+//			}
+//			
+			if(jcbobxForClient.getItemCount()> 0) //si il y a quelque chose dans la liste
+			{
+				System.out.println("hello ma liste est plus grande que 0");
+				//remplissage du panel par rapport aux clients connecter.
+				for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) 
+				{
+					System.out.println("nom du fichier" + myFile);
+					
+					//System.out.println(theLabel.);
+					model.addElement(myFile);
+					
 				}
 				System.out.println(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles());
 			}
 		}
+	}
+	
+	private class DownloadButtonClick implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) 
+		{
+			String myFile = model.get(JlstFile.getSelectedIndex());
+			System.out.println(myFile);
+			Client target = listOfClients.get(jcbobxForClient.getSelectedIndex());
+			
+			
+			// ICI ON TROUVE COMMENT ENVOYER FICHIER A L'AUTRE GUSSE
+			//de client a client , sans passé par le server , donc il faut recupéré l'adresse ip du client a qui apparetien le fichier.
+			//si le temps on peux faire un pop-up vers le client pour qu'il accdpte le dls
+		}
+		
 	}
 }
