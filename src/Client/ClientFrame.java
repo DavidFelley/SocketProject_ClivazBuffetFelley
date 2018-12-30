@@ -206,7 +206,8 @@ public class ClientFrame
 		txtAreaChat = new JTextArea();
 		scrollChat.setViewportView(txtAreaChat);
 
-		jtxtfServer.setText("192.168.43.242");
+		//Afin de faire des tests plsu rapidement nous mettons des donnée en dur (mettre en commentaire par la suiste)
+		jtxtfServer.setText("127.0.0.1");
 		jtxtfLogin.setText("loan");
 		jtxtfPassword.setText("1234");
 
@@ -216,6 +217,7 @@ public class ClientFrame
 		frame.setVisible(true);
 	}
 
+	/* ajout de chaque fichier dans le dossier dans une liste*/
 	private void addFileInList(String [] listOfFiles)
 	{
 		for (int i = 0; i < listOfFiles.length; i++)
@@ -228,17 +230,21 @@ public class ClientFrame
 		pnlSharedFiles.repaint();
 	}
 
+	/* Connection du client vers le server suivant les infos donnée
+	 */
 	private void connect() throws IOException
 	{
 		ipServer = jtxtfServer.getText();
 		clientSocket = new Socket(ipServer, 45000);
+		
+		ipClient = clientSocket.getLocalAddress().getHostAddress();
 		inStream = new ObjectInputStream(clientSocket.getInputStream());
 		outStream = new ObjectOutputStream(clientSocket.getOutputStream());
 		buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 		login = jtxtfLogin.getText();
 		password = jtxtfPassword.getText();
-		ipClient = clientSocket.getLocalAddress().getHostAddress();
+		
 		listOfFiles = getListOfFiles();
 
 		myClient = new Client(login, password, ipClient, listOfFiles, exist);
@@ -249,7 +255,7 @@ public class ClientFrame
 
 	}
 
-	//CETTE METHODE DOIT PERMETTRE AU CLIENT D'ECOUTER EN PERMANENCE LE SERVEUR POUR SAVOIR SI DE NOUVELLES PERSONNES SONT CONNECTEES
+	//cette methode permet l'écoute 
 	private void listenServer()
 	{
 		new Thread(new Runnable() {
@@ -260,10 +266,24 @@ public class ClientFrame
 						Object o = inStream.readObject();
 						if(o instanceof Message) {
 							Message m = (Message)o;
-							String sender = m.getClient().getName().equals(myClient.getName()) ? "Me" : m.getClient().getName();
-							txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
+							
+						//lors de l'envoie du message , si c'est nous qui envoyont le message nous voyons "Me" a la place de notre pseudo
+							if (m.getClient().getName().equals(myClient.getName())) 
+							{
+								String sender =  "Me";
+								txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
+							}
+							else
+							{
+								String sender 	=  m.getClient().getName();
+								txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
+							}
+							
+						
+							
 						}
 
+						//liste des fichiers client (Loan)
 						if(o instanceof ArrayList){
 							if(((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client){
 								listOfClients = (ArrayList<Client>)o;
