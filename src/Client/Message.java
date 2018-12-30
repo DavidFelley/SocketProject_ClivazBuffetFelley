@@ -6,10 +6,10 @@ import java.time.LocalDate;
 public class Message implements Serializable  {
     private final String message;
     private final LocalDate date;
-    private final Client client;
-    public Message(String message, Client client) {
+    private final Client myclient;
+    public Message(String message, Client myclient) {
         this.message = message;
-        this.client = client;
+        this.myclient = myclient;
         this.date = LocalDate.now();
     }
 
@@ -22,6 +22,6 @@ public class Message implements Serializable  {
     }
 
     public Client getClient() {
-        return client;
+        return myclient;
     }
 }

@@ -29,7 +29,7 @@ import java.awt.Choice;
 public class ServerFrame {
 
 	private JFrame frmServer;
-	private JPanel panelInfoServer = new JPanel(); 
+	private JPanel pnlInfoServer = new JPanel(); 
 	/**
 	 * Create the application.
 	 */
@@ -66,15 +66,15 @@ public class ServerFrame {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(89, 11, 1046, 539);
-		scrollPane.setViewportView(panelInfoServer);
+		scrollPane.setViewportView(pnlInfoServer);
 		scrollPane.setVisible(true);
 		panelServer.add(scrollPane);
 		
 		
-		panelInfoServer.setBackground(Color.GRAY);
-		panelInfoServer.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
-		panelInfoServer.setBounds(36, 11, 1050, 543);
-		panelInfoServer.setLayout(new BoxLayout(panelInfoServer, BoxLayout.Y_AXIS));
+		pnlInfoServer.setBackground(Color.GRAY);
+		pnlInfoServer.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
+		pnlInfoServer.setBounds(36, 11, 1050, 543);
+		pnlInfoServer.setLayout(new BoxLayout(pnlInfoServer, BoxLayout.Y_AXIS));
 
 		frmServer.setVisible(true);
 	}
@@ -83,9 +83,9 @@ public class ServerFrame {
 	{
 		JLabel lbl = new JLabel( message);
 
-		panelInfoServer.add(lbl);
-		panelInfoServer.validate();
-		panelInfoServer.repaint();
+		pnlInfoServer.add(lbl);
+		pnlInfoServer.validate();
+		pnlInfoServer.repaint();
 	}
 	
 	class powerOff implements ActionListener

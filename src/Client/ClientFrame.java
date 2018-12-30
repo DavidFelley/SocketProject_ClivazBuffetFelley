@@ -38,7 +38,7 @@ import javax.swing.JScrollPane;
 public class ClientFrame
 {
 	//Variables of connection
-	private Client client = null;
+	private Client myClient = null;
 	private String login = "";
 	private String password = "";
 	private String ipClient = "";
@@ -46,27 +46,27 @@ public class ClientFrame
 	private String [] listOfFiles = null ;
 	private boolean exist;
 	private Socket clientSocket = null;
-	private ObjectOutputStream out = null;
-	private ObjectInputStream ois = null;
+	private ObjectOutputStream outStream = null;
+	private ObjectInputStream inStream = null;
 	private BufferedReader buffin = null;
-	private JFileChooser fc = new JFileChooser();
+	private JFileChooser myJfileChooser = new JFileChooser();
 	private ArrayList<Client> listOfClients = new ArrayList<>();
 
 	//Variables graphiques
 	private JFrame frame;
-	private JTextField loginField;
-	private JTextField serverField;
-	private JPasswordField passwordField;
-	private JPanel panelSharedFiles ;
-	private JPanel panelListShared;
-	private CardLayout cardlayout = new CardLayout();
-	private JPanel mainPanel = new JPanel(cardlayout);
-	private JPanel panelServer;
+	private JTextField jtxtfLogin;
+	private JTextField jtxtfServer;
+	private JPasswordField jtxtfPassword;
+	private JPanel pnlSharedFiles ;
+	private JPanel pnlListShared;
+	private CardLayout myCardLayout = new CardLayout();
+	private JPanel pnlMain = new JPanel(myCardLayout);
+	private JPanel pnlServer;
 	private JLabel lblLogin;
 	private JLabel lblError;
-	private JComboBox cbOnlineUser;
+	private JComboBox jcbobxForClient;
 	private JTextField txtFMsgSend;
-	private JPanel panelListFiles;
+	private JPanel pnlFileListes;
 	private JScrollPane scrollChat;
 	private JTextArea txtAreaChat;
 
@@ -90,26 +90,26 @@ public class ClientFrame
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
-		frame.getContentPane().add(mainPanel);
+		frame.getContentPane().add(pnlMain);
 
 		JPanel panelLogin = new JPanel();
-		mainPanel.add(panelLogin, "panelLogin");
+		pnlMain.add(panelLogin, "panelLogin");
 		panelLogin.setBackground(Color.DARK_GRAY);
 		panelLogin.setLayout(null);
 
-		loginField = new JTextField();
-		loginField.setBounds(332, 78, 330, 22);
-		panelLogin.add(loginField);
-		loginField.setColumns(10);
+		jtxtfLogin = new JTextField();
+		jtxtfLogin.setBounds(332, 78, 330, 22);
+		panelLogin.add(jtxtfLogin);
+		jtxtfLogin.setColumns(10);
 
-		serverField = new JTextField();
-		serverField.setBounds(332, 396, 330, 22);
-		panelLogin.add(serverField);
-		serverField.setColumns(10);
+		jtxtfServer = new JTextField();
+		jtxtfServer.setBounds(332, 396, 330, 22);
+		panelLogin.add(jtxtfServer);
+		jtxtfServer.setColumns(10);
 
-		passwordField = new JPasswordField();
-		passwordField.setBounds(332, 237, 330, 22);
-		panelLogin.add(passwordField);
+		jtxtfPassword = new JPasswordField();
+		jtxtfPassword.setBounds(332, 237, 330, 22);
+		panelLogin.add(jtxtfPassword);
 
 		lblLogin = new JLabel("Login");
 		lblLogin.setForeground(Color.RED);
@@ -149,66 +149,66 @@ public class ClientFrame
 		lblError.setBounds(236, 458, 522, 22);
 		panelLogin.add(lblError);
 
-		panelServer = new JPanel();
-		mainPanel.add(panelServer, "panelServer");
-		panelServer.setBackground(Color.DARK_GRAY);
-		panelServer.setLayout(null);
+		pnlServer = new JPanel();
+		pnlMain.add(pnlServer, "panelServer");
+		pnlServer.setBackground(Color.DARK_GRAY);
+		pnlServer.setLayout(null);
 
 		JPanel panelFiles = new JPanel();
 		panelFiles.setBounds(12, 13, 251, 420);
-		panelServer.add(panelFiles);
+		pnlServer.add(panelFiles);
 		panelFiles.setLayout(new BorderLayout(0, 0));
 
-		panelListFiles = new JPanel();
-		panelFiles.add(panelListFiles, BorderLayout.CENTER);
+		pnlFileListes = new JPanel();
+		panelFiles.add(pnlFileListes, BorderLayout.CENTER);
 
-		cbOnlineUser = new JComboBox<String>();
-		cbOnlineUser.addActionListener(new SelectionChanged());
-		panelFiles.add(cbOnlineUser, BorderLayout.NORTH);
+		jcbobxForClient = new JComboBox<String>();
+		jcbobxForClient.addActionListener(new SelectionChanged());
+		panelFiles.add(jcbobxForClient, BorderLayout.NORTH);
 
-		panelSharedFiles = new JPanel();
-		panelSharedFiles.setBounds(731, 13, 251, 420);
-		panelServer.add(panelSharedFiles);
-		panelSharedFiles.setLayout(new BorderLayout(10, 0));
+		pnlSharedFiles = new JPanel();
+		pnlSharedFiles.setBounds(731, 13, 251, 420);
+		pnlServer.add(pnlSharedFiles);
+		pnlSharedFiles.setLayout(new BorderLayout(10, 0));
 
 		JPanel panel = new JPanel();
-		panelSharedFiles.add(panel, BorderLayout.NORTH);
+		pnlSharedFiles.add(panel, BorderLayout.NORTH);
 
 		JLabel lblSharedFiles = new JLabel("My Files");
 		panel.add(lblSharedFiles);
 
-		panelListShared= new JPanel();
-		panelSharedFiles.add(panelListShared, BorderLayout.CENTER);
+		pnlListShared= new JPanel();
+		pnlSharedFiles.add(pnlListShared, BorderLayout.CENTER);
 
 		JButton btnAddFile = new JButton("Add File");
 		btnAddFile.addActionListener(new addFile());
 		btnAddFile.setBounds(731, 448, 97, 25);
-		panelServer.add(btnAddFile);
+		pnlServer.add(btnAddFile);
 
 		JButton btnDownload = new JButton("Download");
 		btnDownload.setBounds(12, 448, 97, 25);
-		panelServer.add(btnDownload);
+		pnlServer.add(btnDownload);
 
 		JButton btnSend = new JButton("New button");
 		btnSend.addActionListener(new sendMessage());
 		btnSend.setBounds(632, 449, 89, 23);
-		panelServer.add(btnSend);
+		pnlServer.add(btnSend);
 
 		txtFMsgSend = new JTextField();
 		txtFMsgSend.setBounds(272, 448, 350, 22);
-		panelServer.add(txtFMsgSend);
+		pnlServer.add(txtFMsgSend);
 		txtFMsgSend.setColumns(10);
 		
 		scrollChat = new JScrollPane();
 		scrollChat.setBounds(273, 13, 449, 420);
-		panelServer.add(scrollChat);
+		pnlServer.add(scrollChat);
 		
 		txtAreaChat = new JTextArea();
 		scrollChat.setViewportView(txtAreaChat);
 
-		serverField.setText("192.168.43.242");
-		loginField.setText("loan");
-		passwordField.setText("1234");
+		jtxtfServer.setText("192.168.43.242");
+		jtxtfLogin.setText("loan");
+		jtxtfPassword.setText("1234");
 
 		DefaultCaret caret = (DefaultCaret)txtAreaChat.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -221,30 +221,30 @@ public class ClientFrame
 		for (int i = 0; i < listOfFiles.length; i++)
 		{
 			JLabel lblfileName = new JLabel(listOfFiles[i]);
-			panelListShared.add(lblfileName);
+			pnlListShared.add(lblfileName);
 		}
 
-		panelSharedFiles.validate();
-		panelSharedFiles.repaint();
+		pnlSharedFiles.validate();
+		pnlSharedFiles.repaint();
 	}
 
 	private void connect() throws IOException
 	{
-		ipServer = serverField.getText();
+		ipServer = jtxtfServer.getText();
 		clientSocket = new Socket(ipServer, 45000);
-		ois = new ObjectInputStream(clientSocket.getInputStream());
-		out = new ObjectOutputStream(clientSocket.getOutputStream());
+		inStream = new ObjectInputStream(clientSocket.getInputStream());
+		outStream = new ObjectOutputStream(clientSocket.getOutputStream());
 		buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-		login = loginField.getText();
-		password = passwordField.getText();
+		login = jtxtfLogin.getText();
+		password = jtxtfPassword.getText();
 		ipClient = clientSocket.getLocalAddress().getHostAddress();
 		listOfFiles = getListOfFiles();
 
-		client = new Client(login, password, ipClient, listOfFiles, exist);
+		myClient = new Client(login, password, ipClient, listOfFiles, exist);
 
-		out.writeObject(client);
-		int controle = ois.readInt();
+		outStream.writeObject(myClient);
+		int controle = inStream.readInt();
 		controleConnection(controle);
 
 	}
@@ -257,20 +257,20 @@ public class ClientFrame
 			public void run() {
 				while (true) {
 					try {
-						Object o = ois.readObject();
+						Object o = inStream.readObject();
 						if(o instanceof Message) {
 							Message m = (Message)o;
-							String sender = m.getClient().getName().equals(client.getName()) ? "Me" : m.getClient().getName();
+							String sender = m.getClient().getName().equals(myClient.getName()) ? "Me" : m.getClient().getName();
 							txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
 						}
 
 						if(o instanceof ArrayList){
 							if(((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client){
 								listOfClients = (ArrayList<Client>)o;
-								if(cbOnlineUser.getItemCount() >=1)
-									cbOnlineUser.removeAllItems();
+								if(jcbobxForClient.getItemCount() >=1)
+									jcbobxForClient.removeAllItems();
 								for (Client thisClient : listOfClients) {
-									cbOnlineUser.addItem(thisClient);
+									jcbobxForClient.addItem(thisClient);
 								}
 							}
 						}
@@ -294,8 +294,8 @@ public class ClientFrame
 				frame.validate();
 				break;
 			case 1:
-				addFileInList(client.getListOfFiles());
-				cardlayout.show(mainPanel, "panelServer");
+				addFileInList(myClient.getListOfFiles());
+				myCardLayout.show(pnlMain, "panelServer");
 				listenServer();
 				break;
 
@@ -369,18 +369,18 @@ public class ClientFrame
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			int resultat = fc.showOpenDialog(panelServer);
+			int resultat = myJfileChooser.showOpenDialog(pnlServer);
 
-			if(resultat == fc.CANCEL_OPTION)
+			if(resultat == myJfileChooser.CANCEL_OPTION)
 			{
-				fc.cancelSelection();
+				myJfileChooser.cancelSelection();
 				return;
 			}
 
-			if (resultat == fc.APPROVE_OPTION)
+			if (resultat == myJfileChooser.APPROVE_OPTION)
 			{
-				saveToDirectory(fc.getSelectedFile().getAbsolutePath());
-				panelSharedFiles.add(panelListShared, BorderLayout.CENTER);
+				saveToDirectory(myJfileChooser.getSelectedFile().getAbsolutePath());
+				pnlSharedFiles.add(pnlListShared, BorderLayout.CENTER);
 			}
 		}
 	}
@@ -407,8 +407,8 @@ public class ClientFrame
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				out.writeObject(new Message(txtFMsgSend.getText(), client));
-				out.flush();
+				outStream.writeObject(new Message(txtFMsgSend.getText(), myClient));
+				outStream.flush();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -418,9 +418,9 @@ public class ClientFrame
 	private class SelectionChanged implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			panelListFiles.removeAll();
-			if(cbOnlineUser.getItemCount()> 0){
-				for (String myFile : listOfClients.get(cbOnlineUser.getSelectedIndex()).getListOfFiles()) {
+			pnlFileListes.removeAll();
+			if(jcbobxForClient.getItemCount()> 0){
+				for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) {
 					JLabel theLabel = new JLabel(myFile);
 					theLabel.addMouseListener(new MouseAdapter() {
 						@Override
@@ -428,9 +428,9 @@ public class ClientFrame
 							// ICI ON TROUVE COMMENT ENVOYER FICHIER A L'AUTRE GUSSE
 						}
 					});
-					panelListFiles.add(theLabel);
+					pnlFileListes.add(theLabel);
 				}
-				System.out.println(listOfClients.get(cbOnlineUser.getSelectedIndex()).getListOfFiles());
+				System.out.println(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles());
 			}
 		}
 	}

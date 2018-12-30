@@ -20,14 +20,14 @@ public class AccepteClient extends Thread
 	private ServerFrame sf = null;
 	private Socket clientSocketOnServer = null;
 	private ArrayList<AccepteClient> clientsConnected = null;
-	private Client client = null;
+	private Client myClient = null;
 	private ArrayList<Client> listOfClient = null;
 	private BufferedReader buffin = null;
 
 	//Envoie d'info pour le client
 	private PrintWriter validate = null;
-	private ObjectInputStream ois = null;
-	private ObjectOutputStream oos = null;
+	private ObjectInputStream inStream = null;
+	private ObjectOutputStream outStream = null;
 	private int validation = -1;
 
 	//Constructor
@@ -45,21 +45,21 @@ public class AccepteClient extends Thread
 	{
 		try
 		{
-			oos = new ObjectOutputStream(clientSocketOnServer.getOutputStream());
+			outStream = new ObjectOutputStream(clientSocketOnServer.getOutputStream());
 			validate = new PrintWriter(clientSocketOnServer.getOutputStream());
-			ois = new ObjectInputStream(clientSocketOnServer.getInputStream());
-			client = (Client) ois.readObject();
+			inStream = new ObjectInputStream(clientSocketOnServer.getInputStream());
+			myClient = (Client) inStream.readObject();
 
 			listOfClient = (ArrayList<Client>)(serialize.deSerializeObject());
 
-			if (client.isExist())
+			if (myClient.isExist())
 			{
 				//Controle si le client existe deja
 				for (Client clientRegistered : listOfClient)
 				{
-					if(clientRegistered.getName().equalsIgnoreCase(client.getName()))
+					if(clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
 					{
-						if(clientRegistered.getMdp().equals(client.getMdp()))
+						if(clientRegistered.getMdp().equals(myClient.getMdp()))
 						{
 							System.out.println("Mot de passe correct");
 							validation = 1;
@@ -85,7 +85,7 @@ public class AccepteClient extends Thread
 				//Controle si le client existe deja
 				for (Client clientRegistered : listOfClient)
 				{
-					if(clientRegistered.getName().equalsIgnoreCase(client.getName()))
+					if(clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
 					{
 						validation = 2;
 						break;
@@ -94,15 +94,15 @@ public class AccepteClient extends Thread
 
 				if (validation != 2)
 				{
-					Client newClient = new Client(client.getName(), client.getMdp());
+					Client newClient = new Client(myClient.getName(), myClient.getMdp());
 					listOfClient.add(newClient);
 					serialize.serializeObject(listOfClient);
 					validation = 1;
 				}
 			}
 
-			oos.writeInt(1);
-			oos.flush();
+			outStream.writeInt(1);
+			outStream.flush();
 			
 
 
@@ -113,19 +113,19 @@ public class AccepteClient extends Thread
 				updateClientList();
 				try {
 					Object o;
-					while((o = ois.readObject())!=null) {
+					while((o = inStream.readObject())!=null) {
 						if(o instanceof Message) {
 							Message m = (Message)o;
 							sf.createLabel(m.getClient().getName() + " : " + m.getMessage());
 							for (AccepteClient accepteClient : clientsConnected) {
-								accepteClient.oos.writeObject(m);
-								accepteClient.oos.flush();
+								accepteClient.outStream.writeObject(m);
+								accepteClient.outStream.flush();
 							}
 							
 						}
 						if(o instanceof CloseMyConnection) {
 							CloseMyConnection cmc = (CloseMyConnection)o;
-							if(client.getName().equals(cmc.getClient().getName())) {
+							if(myClient.getName().equals(cmc.getClient().getName())) {
 								System.out.println("je quitte tout");
 							}
 						}
@@ -166,11 +166,11 @@ public class AccepteClient extends Thread
 
 		ArrayList<Client> alClient = new ArrayList<Client>();
 		for (AccepteClient accepteClient : clientsConnected) {
-			alClient.add(accepteClient.client);
+			alClient.add(accepteClient.myClient);
 		}
 		for (AccepteClient accepteClient : clientsConnected) {
-			accepteClient.oos.writeObject(alClient);
-			accepteClient.oos.flush();
+			accepteClient.outStream.writeObject(alClient);
+			accepteClient.outStream.flush();
 		}
 		
 	}
