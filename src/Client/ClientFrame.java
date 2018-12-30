@@ -189,7 +189,7 @@ public class ClientFrame
 		btnDownload.setBounds(12, 448, 97, 25);
 		pnlServer.add(btnDownload);
 
-		JButton btnSend = new JButton("New button");
+		JButton btnSend = new JButton("Send");
 		btnSend.addActionListener(new sendMessage());
 		btnSend.setBounds(632, 449, 89, 23);
 		pnlServer.add(btnSend);
@@ -204,6 +204,7 @@ public class ClientFrame
 		pnlServer.add(scrollChat);
 		
 		txtAreaChat = new JTextArea();
+		txtAreaChat.setEditable(false); //pour ne pas editer le chat
 		scrollChat.setViewportView(txtAreaChat);
 
 		//Afin de faire des tests plsu rapidement nous mettons des donnée en dur (mettre en commentaire par la suiste)
@@ -212,7 +213,7 @@ public class ClientFrame
 		jtxtfPassword.setText("1234");
 
 		DefaultCaret caret = (DefaultCaret)txtAreaChat.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		caret.setUpdatePolicy(DefaultCaret.OUT_BOTTOM);
 		
 		frame.setVisible(true);
 	}
