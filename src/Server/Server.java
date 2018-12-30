@@ -23,7 +23,7 @@ public class Server
 		//Initialise la frame
 		sf = new ServerFrame();
 		
-		//cree les fichiers de sauvegarde utilisateurs si n'existent pas
+		//cree les fichiers de sauvegarde utilisateurs si n'existent pas 
 		serialize.createFile();
 		
 		ServerSocket mySkServer;

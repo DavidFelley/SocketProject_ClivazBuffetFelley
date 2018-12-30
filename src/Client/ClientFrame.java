@@ -499,7 +499,7 @@ public class ClientFrame
 			Client target = listOfClients.get(jcbobxForClient.getSelectedIndex());
 			
 			
-			// ICI ON TROUVE COMMENT ENVOYER FICHIER A L'AUTRE GUSSE 
+			// ICI ON TROUVE COMMENT ENVOYER FICHIER A L'AUTRE GUS SE 
 			//de client a client , sans passé par le server , donc il faut recupéré l'adresse ip du client a qui apparetien le fichier.
 			//si le temps on peux faire un pop-up vers le client pour qu'il accdpte le dls
 		}

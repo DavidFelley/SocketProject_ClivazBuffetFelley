@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Client implements Serializable 
 {
 	/*
-	 * Création de l'objet client
+	 * Création de l'objet client 
 	 */
 	private String name;
 	private String mdp;
