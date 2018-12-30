@@ -19,7 +19,7 @@ public class AccepteClient extends Thread
 	private Serialize serialize;
 	private ServerFrame sf = null;
 	private Socket clientSocketOnServer = null;
-	private ArrayList<AccepteClient> clientsConnected = null;
+	private ArrayList<AccepteClient> listClientsConnected = null;
 	private Client myClient = null;
 	private ArrayList<Client> listOfClient = null;
 	private BufferedReader buffin = null;
@@ -36,7 +36,7 @@ public class AccepteClient extends Thread
 		this.clientSocketOnServer = clientSocketOnServer;
 		this.sf = sf;
 		this.serialize = serialize;
-		this.clientsConnected = clientsConnected;
+		this.listClientsConnected = clientsConnected;
 	}
 
 	//overwrite the thread run()
@@ -109,7 +109,7 @@ public class AccepteClient extends Thread
 			//Si le client est validé
 			if (validation== 1)
 			{
-				this.clientsConnected.add(this);
+				this.listClientsConnected.add(this);
 				updateClientList();
 				try {
 					Object o;
@@ -117,7 +117,7 @@ public class AccepteClient extends Thread
 						if(o instanceof Message) {
 							Message m = (Message)o;
 							sf.createLabel(m.getClient().getName() + " : " + m.getMessage());
-							for (AccepteClient accepteClient : clientsConnected) {
+							for (AccepteClient accepteClient : listClientsConnected) {
 								accepteClient.outStream.writeObject(m);
 								accepteClient.outStream.flush();
 							}
@@ -132,7 +132,7 @@ public class AccepteClient extends Thread
 					}
 				}
 				catch(SocketException e) {
-					clientsConnected.remove(this);
+					listClientsConnected.remove(this);
 					updateClientList();
 					System.out.println("Client disconnected");
 				}
@@ -165,10 +165,10 @@ public class AccepteClient extends Thread
 	private void updateClientList() throws IOException {
 
 		ArrayList<Client> alClient = new ArrayList<Client>();
-		for (AccepteClient accepteClient : clientsConnected) {
+		for (AccepteClient accepteClient : listClientsConnected) {
 			alClient.add(accepteClient.myClient);
 		}
-		for (AccepteClient accepteClient : clientsConnected) {
+		for (AccepteClient accepteClient : listClientsConnected) {
 			accepteClient.outStream.writeObject(alClient);
 			accepteClient.outStream.flush();
 		}

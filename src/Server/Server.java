@@ -10,7 +10,7 @@ public class Server
 	private ServerFrame sf;
 	private Socket clientSocket = null;
 	private Serialize serialize = new Serialize();
-	private ArrayList<AccepteClient> clientsConnected = new ArrayList<>();
+	private ArrayList<AccepteClient> listClientsConnected = new ArrayList<>();
 
 	public Server() 
 	{
@@ -38,7 +38,7 @@ public class Server
 				clientSocket = mySkServer.accept();
 				System.out.println("connection request received");
 				
-				Thread t = new AccepteClient(clientSocket, clientsConnected, sf, serialize);
+				Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize);
 
 				//starting the thread
 				t.start();
