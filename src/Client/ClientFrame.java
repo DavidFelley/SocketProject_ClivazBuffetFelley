@@ -9,15 +9,11 @@ import javax.swing.text.DefaultCaret;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +27,7 @@ import javax.swing.JFileChooser;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.CardLayout;
-import java.util.List;
+import java.util.Arrays;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
@@ -41,18 +37,22 @@ public class ClientFrame
 {
 	//Variables of connection
 	private Client myClient = null;
-	private String login = "";
-	private String password = "";
-	private String ipClient = "";
-	private String ipServer = "";
 	private String [] listOfFiles = null ;
 	private boolean exist;
 	private Socket clientSocket = null;
+	private Socket clientRequestSocket = null;
+	private ServerSocket myHostClient = null;
 	private ObjectOutputStream outStream = null;
-	private ObjectInputStream inStream = null;
-	private BufferedReader buffin = null;
+	private OutputStream outStreamClienttoClient = null;
+	private ObjectInputStream inStream = null; // discution avec le server
+	private ObjectInputStream inStreamClienttoClient = null; // discussion avec le client pour le dl
 	private JFileChooser myJfileChooser = new JFileChooser();
 	private ArrayList<Client> listOfClients = new ArrayList<>();
+	private Socket requestClient;
+	private InputStream inStreamRequestClient;
+	private ObjectOutputStream outStreamRequestClient;
+
+	private String directoryFiles = "C:\\SharedDocuments\\";
 
 	//Variables graphiques
 	private JFrame frame;
@@ -64,15 +64,12 @@ public class ClientFrame
 	private CardLayout myCardLayout = new CardLayout();
 	private JPanel pnlMain = new JPanel(myCardLayout);
 	private JPanel pnlServer;
-	private JLabel lblLogin;
 	private JLabel lblError;
 	private JComboBox jcbobxForClient;
 	private JTextField txtFMsgSend;
-	private JScrollPane scrollChat;
 	private JTextArea txtAreaChat;
 	private DefaultListModel<String> model;
-	private JList JlstFile;
-
+	private JList<String> JlstFile;
 
 	/**
 	 * Create the application.
@@ -85,8 +82,7 @@ public class ClientFrame
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize()
-	{
+	private void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 1000, 650);
@@ -114,7 +110,7 @@ public class ClientFrame
 		jtxtfPassword.setBounds(332, 237, 330, 22);
 		panelLogin.add(jtxtfPassword);
 
-		lblLogin = new JLabel("Login");
+		JLabel lblLogin = new JLabel("Login");
 		lblLogin.setForeground(Color.RED);
 		lblLogin.setFont(new Font("Tahoma", Font.BOLD, 20));
 		lblLogin.setBounds(332, 43, 191, 34);
@@ -168,8 +164,7 @@ public class ClientFrame
 		
 		model = new DefaultListModel<>();
 		
-		
-		JlstFile = new JList(model);
+		JlstFile = new JList<>(model);
 		panelFiles.add(JlstFile, BorderLayout.CENTER);
 
 		pnlSharedFiles = new JPanel();
@@ -205,8 +200,8 @@ public class ClientFrame
 		txtFMsgSend.setBounds(272, 448, 350, 22);
 		pnlServer.add(txtFMsgSend);
 		txtFMsgSend.setColumns(10);
-		
-		scrollChat = new JScrollPane();
+
+		JScrollPane scrollChat = new JScrollPane();
 		scrollChat.setBounds(273, 13, 449, 420);
 		pnlServer.add(scrollChat);
 		
@@ -214,8 +209,8 @@ public class ClientFrame
 		txtAreaChat.setEditable(false); //pour ne pas editer le chat
 		scrollChat.setViewportView(txtAreaChat);
 
-		//Afin de faire des tests plsu rapidement nous mettons des donnée en dur (mettre en commentaire par la suiste)
-		jtxtfServer.setText("127.0.0.1");
+		//Afin de faire des tests plsu rapidement nous mettons des donnï¿½e en dur (mettre en commentaire par la suiste)
+		jtxtfServer.setText("192.168.43.242");
 		jtxtfLogin.setText("loan");
 		jtxtfPassword.setText("1234");
 
@@ -226,32 +221,27 @@ public class ClientFrame
 	}
 
 	/* ajout de chaque fichier dans le dossier dans une liste*/
-	private void addFileInList(String [] listOfFiles)
-	{
-		for (int i = 0; i < listOfFiles.length; i++)
-		{
-			JLabel lblfileName = new JLabel(listOfFiles[i]);
+	private void addFileInList(String [] listOfFiles) {
+		for (String listOfFile : listOfFiles) {
+			JLabel lblfileName = new JLabel(listOfFile);
 			pnlListShared.add(lblfileName);
 		}
-
 		pnlSharedFiles.validate();
 		pnlSharedFiles.repaint();
 	}
 
-	/* Connection du client vers le server suivant les infos donnée
+	/* Connection du client vers le server suivant les infos donnï¿½e
 	 */
-	private void connect() throws IOException
-	{
-		ipServer = jtxtfServer.getText();
+	private void connect() throws IOException {
+		String ipServer = jtxtfServer.getText();
 		clientSocket = new Socket(ipServer, 45000);
-		
-		ipClient = clientSocket.getLocalAddress().getHostAddress();
+
+		String ipClient = clientSocket.getLocalAddress().getHostAddress();
 		inStream = new ObjectInputStream(clientSocket.getInputStream());
 		outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-		buffin = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-		login = jtxtfLogin.getText();
-		password = jtxtfPassword.getText();
+		String login = jtxtfLogin.getText();
+		String password = jtxtfPassword.getText();
 		
 		listOfFiles = getListOfFiles();
 
@@ -260,79 +250,130 @@ public class ClientFrame
 		outStream.writeObject(myClient);
 		int controle = inStream.readInt();
 		controleConnection(controle);
-
 	}
 
 	/*
 	 * mise a jour de l'interface graphique du client par rapport au changement
-	 * nouveau message , nouveau liste de fichiers , nouveau client connecté , ...
+	 * nouveau message , nouveau liste de fichiers , nouveau client connectï¿½ , ...
 	 */
-	private void listenServer() 
-	{
-		new Thread(new Runnable() {
+	private void listenServer() {
+		new Thread(new Runnable()
+		{
 			@Override
 			public void run() {
-				while (true) 
-				{
-				try {
+				while (true) {
+					try {
 						Object o = inStream.readObject();
 						/*
 						 * si l'objet mis a jour est un message
 						 * alors on met a jout le texte area
 						 */
-						if(o instanceof Message) 
-						{
+						if(o instanceof Message) {
 							Message m = (Message)o;
 							//lors de l'envoie du message , si c'est nous qui envoyont le message nous voyons "Me" a la place de notre pseudo
-							if (m.getClient().getName().equals(myClient.getName())) 
-							{
+							if (m.getClient().getName().equals(myClient.getName())) {
 								String sender =  "Me";
 								txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
 							}
-							else
-							{
+							else {
 								String sender 	=  m.getClient().getName();
 								txtAreaChat.append(sender + " : " + m.getMessage() + "\n");
 							}
 						}
-						
+
 						/*
 						 * si l'objet mis a jour est un ArrayList
 						 *liste des fichiers client (Loan)
 						 */
-						
-						if(o instanceof ArrayList)
-						{
-							if(((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client)
-							{
+
+						if(o instanceof ArrayList) {
+							if(((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client) {
 								listOfClients = (ArrayList<Client>)o;
-								if(jcbobxForClient.getItemCount() >=1)
-								{
+								if(jcbobxForClient.getItemCount() >=1) {
 									jcbobxForClient.removeAllItems();
 								}
-								for (Client thisClient : listOfClients) 
-								{
+								for (Client thisClient : listOfClients) {
 									jcbobxForClient.addItem(thisClient);
 									System.out.println(thisClient.getName());
 									System.out.println(listOfClients);
-									
 								}
 							}
 						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (ClassNotFoundException e) {
+					} catch (IOException | ClassNotFoundException e) {
 						e.printStackTrace();
 					}
 				}
 			}
 		}).start();
+
+		new Thread(new Runnable() //Thread ê¤¨ange fichier  , partie h??(le client qui possé¥¥ le fichier)
+		{
+			//donc ici je suis le client qui possé¥¥ le fichier
+			@Override
+			public void run()
+			{
+				//crê¢´ion d'un socketsrv
+				try {
+					myHostClient = new ServerSocket(45001,10, InetAddress.getByName(myClient.getIp()));
+
+					Object oClient = null;
+					while (true)
+					{
+						/*
+						 *  Crê¢´ion du server pour l'hote du fichier
+						 */
+
+						clientRequestSocket = myHostClient.accept();
+						inStreamClienttoClient = new ObjectInputStream(clientRequestSocket.getInputStream());
+						outStreamClienttoClient = clientRequestSocket.getOutputStream();
+
+						try
+						{
+							// J'ê¤¯ute si quelqu'un veut un fichier
+							oClient = inStreamClienttoClient.readObject();
+						}
+						catch (ClassNotFoundException | IOException e)
+						{
+							e.printStackTrace();
+						}
+						//a tester si vraim,ent besoin de 2 inputstream diffê³¥nt
+
+						if(oClient instanceof FileRequest)
+						{
+							FileRequest frClient = (FileRequest)oClient;
+							//Cherche le fichier correspondant
+							//on part du principe que le dossier d'envoie et le më®¥ que celui de reception
+							File dlDirectory = new File(directoryFiles);
+							if(!dlDirectory.exists() || !frClient.getTarget().getIp().equals(myClient.getIp())) // + verification du fichier dans le dossier
+							{
+								return; //pas besoin de continuer
+							}
+							//rê¤µpê³¡tion du fichier convoité¡°ar le client "clientRequest"
+							File monFichier = null;
+							//prise du fichier dans le client qui correspond
+							for(File f : dlDirectory.listFiles()) {
+								if(f.getName().equals(frClient.getNameFile())) {
+									monFichier = f;
+									break;
+								}
+							}
+							System.out.println(monFichier.getAbsolutePath());
+							// envoie du fichier
+							Files.copy(Paths.get(monFichier.getAbsolutePath()),outStreamClienttoClient);
+							clientRequestSocket.close();
+						}
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
-	private void controleConnection(int value)
+	private void controleConnection(int value) 
 	{
-		switch (value)
-		{
+		switch (value) {
 			case 0:
 				lblError.setText("Wrong user or password");
 				frame.repaint();
@@ -356,94 +397,86 @@ public class ClientFrame
 				frame.validate();
 		}
 	}
-
-	private String [] getListOfFiles()
+	//crï¿½ation de la listes des fichiers
+	private String [] getListOfFiles() 
 	{
-		File directory = new File("C:\\SharedDocuments");
+		File directory = new File(directoryFiles);
 
 		if(!directory.exists())
-			directory.mkdir();
-
+		{
+			directory.mkdir(); //crï¿½ation du dossier
+		}
 		String [] files = new String [directory.list().length];
 		File [] lst = directory.listFiles();
 
-		for (int i = 0; i < files.length; i++)
-		{
+		for (int i = 0; i < files.length; i++) {
 			files[i] = lst[i].getName();
 		}
-
 		return files;
 	}
 
-	class LoginClick implements ActionListener
+	class LoginClick implements ActionListener 
 	{
 		@Override
-		public void actionPerformed(ActionEvent e)
+		public void actionPerformed(ActionEvent e) 
 		{
-			try
-			{
+			try {
 				exist = true;
 				connect();
 			}
-			catch (IOException e1)
-			{
+			catch (IOException e1) {
 				e1.printStackTrace();
 			}
 		}
 	}
 
-	class SignInClick implements ActionListener
+	class SignInClick implements ActionListener 
 	{
 		@Override
-		public void actionPerformed(ActionEvent e)
+		public void actionPerformed(ActionEvent e) 
 		{
-			try
-			{
+			try {
 				exist = false;
 				connect();
 			}
-			catch (IOException e1)
+			catch (IOException e1) 
 			{
 				e1.printStackTrace();
 			}
 		}
 	}
 
-	class addFile implements ActionListener
+	class addFile implements ActionListener 
 	{
 		@Override
-		public void actionPerformed(ActionEvent e)
+		public void actionPerformed(ActionEvent e) 
 		{
 			int resultat = myJfileChooser.showOpenDialog(pnlServer);
 
-			if(resultat == myJfileChooser.CANCEL_OPTION)
+			if(resultat == JFileChooser.CANCEL_OPTION) 
 			{
 				myJfileChooser.cancelSelection();
 				return;
 			}
 
-			if (resultat == myJfileChooser.APPROVE_OPTION)
-			{
+			if (resultat == JFileChooser.APPROVE_OPTION) {
 				saveToDirectory(myJfileChooser.getSelectedFile().getAbsolutePath());
 				pnlSharedFiles.add(pnlListShared, BorderLayout.CENTER);
 			}
 		}
 	}
 
-	private void saveToDirectory(String path)
-	{
-		try
-		{
+	private void saveToDirectory(String path) {
+		try {
 			File file = new File(path);
 			Path sourceDirectory = Paths.get(path);
-			Path targetDirectory = Paths.get("C:\\SharedDocuments\\"+file.getName());
+			Path targetDirectory = Paths.get(directoryFiles+file.getName());
 
 			//copy source to target using Files Class
 			Files.copy(sourceDirectory, targetDirectory);
 
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -462,46 +495,60 @@ public class ClientFrame
 	private class SelectionChanged implements ActionListener 
 	{
 		@Override
-		public void actionPerformed(ActionEvent e) 
-		{
-			System.out.println("avant remove" + listOfFiles);
-			model.removeAllElements(); //enlève graphiquemeent
-			//enlèveve tout un par una
-			
-//			for (int j = 0; j < listOfFiles.length; j++) {
-//				pnlFileListes.remove(j);
-//			}
-//			
-			if(jcbobxForClient.getItemCount()> 0) //si il y a quelque chose dans la liste
-			{
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("avant remove" + Arrays.toString(listOfFiles));
+			model.removeAllElements(); //enlï¿½ve l'affichage des fichiers dans la liste
+		
+			if(jcbobxForClient.getItemCount()> 0) 
+			{ //si il y a quelque chose dans la liste
 				System.out.println("hello ma liste est plus grande que 0");
 				//remplissage du panel par rapport aux clients connecter.
 				for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) 
 				{
 					System.out.println("nom du fichier" + myFile);
-					
-					//System.out.println(theLabel.);
 					model.addElement(myFile);
-					
 				}
-				System.out.println(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles());
+				System.out.println(Arrays.toString(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()));
 			}
 		}
 	}
 	
-	private class DownloadButtonClick implements ActionListener{
-
+	/*
+	 * ici on crê¥ le c??"Client" du dl
+	 */
+	private class DownloadButtonClick implements ActionListener 
+	{
 		@Override
 		public void actionPerformed(ActionEvent e) 
 		{
 			String myFile = model.get(JlstFile.getSelectedIndex());
 			System.out.println(myFile);
 			Client target = listOfClients.get(jcbobxForClient.getSelectedIndex());
+			FileRequest fr = new FileRequest(myFile ,myClient, target);
 			
-			
-			// ICI ON TROUVE COMMENT ENVOYER FICHIER A L'AUTRE GUS SE 
-			//de client a client , sans passé par le server , donc il faut recupéré l'adresse ip du client a qui apparetien le fichier.
-			//si le temps on peux faire un pop-up vers le client pour qu'il accdpte le dls
+			new Thread(new Runnable() 
+			{
+				@Override
+				public void run() 
+				{
+					//se connecter au server
+					try {
+						requestClient = new Socket(fr.getTarget().getIp(),45001);
+						System.out.println(fr.getTarget().getIp());
+						inStreamRequestClient = requestClient.getInputStream();
+						System.out.println(3);
+						outStreamRequestClient = new ObjectOutputStream(requestClient.getOutputStream());
+						System.out.println(4);
+						outStreamRequestClient.writeObject(fr);
+						Files.copy(inStreamRequestClient, Paths.get(directoryFiles+fr.getNameFile()));
+					} 
+					catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}).start();
 		}
 		
 	}

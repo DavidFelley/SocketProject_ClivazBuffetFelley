@@ -113,17 +113,25 @@ public class AccepteClient extends Thread
 				updateClientList();
 				try {
 					Object o;
-					while((o = inStream.readObject())!=null) {
-						if(o instanceof Message) {
+					while((o = inStream.readObject())!=null) // il attend le prochain objet que l'on lui envoie
+					{
+						//si un client nous envoie un message nous l'affichons
+						if(o instanceof Message) 
+						{
 							Message m = (Message)o;
+							//afficher le message sur la console du server
 							sf.createLabel(m.getClient().getName() + " : " + m.getMessage());
-							for (AccepteClient accepteClient : listClientsConnected) {
-								accepteClient.outStream.writeObject(m);
+							
+							//envoie le message a tout les clients qui sont connectés.
+							for (AccepteClient accepteClient : listClientsConnected) 
+							{
+								accepteClient.outStream.writeObject(m); //écrit dans gui du srv
 								accepteClient.outStream.flush();
 							}
 							
 						}
-						if(o instanceof CloseMyConnection) {
+						if(o instanceof CloseMyConnection) // si un client part
+						{
 							CloseMyConnection cmc = (CloseMyConnection)o;
 							if(myClient.getName().equals(cmc.getClient().getName())) {
 								System.out.println("je quitte tout");
@@ -131,13 +139,12 @@ public class AccepteClient extends Thread
 						}
 					}
 				}
-				catch(SocketException e) {
+				catch(SocketException e) 
+				{
 					listClientsConnected.remove(this);
 					updateClientList();
 					System.out.println("Client disconnected");
 				}
-				//ICI ON DOIT DONNER AU CLIENT QUI VIENT DE SE CONNECTER LA LISTE DES CLIENTS DEJA CO
-				//+ ON DOIT DONNER AUX CLIENTS DEJA CO LE NOUVEAU CONNECTE
 			}
 			else
 			{
@@ -162,8 +169,11 @@ public class AccepteClient extends Thread
 		}
 	}
 
-	private void updateClientList() throws IOException {
+	//mis a jour de la liste des clinets
+	private void updateClientList() throws IOException 
+	{
 
+		//parcuor la liste des client co , 
 		ArrayList<Client> alClient = new ArrayList<Client>();
 		for (AccepteClient accepteClient : listClientsConnected) {
 			alClient.add(accepteClient.myClient);
