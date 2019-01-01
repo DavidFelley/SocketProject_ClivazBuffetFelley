@@ -1,187 +1,152 @@
 package Server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.net.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import Client.Client;
 import Client.CloseMyConnection;
 import Client.Message;
 
-public class AccepteClient extends Thread
-{
-	private Serialize serialize;
-	private ServerFrame sf = null;
-	private Socket clientSocketOnServer = null;
-	private ArrayList<AccepteClient> listClientsConnected = null;
-	private Client myClient = null;
-	private ArrayList<Client> listOfClient = null;
-	private BufferedReader buffin = null;
+import java.io.*;
+import java.net.Socket;
+import java.net.SocketException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
-	//Envoie d'info pour le client
-	private PrintWriter validate = null;
-	private ObjectInputStream inStream = null;
-	private ObjectOutputStream outStream = null;
-	private int validation = -1;
+public class AccepteClient extends Thread {
+    private Serialize serialize;
+    private ServerFrame sf = null;
+    private Socket clientSocketOnServer = null;
+    private ArrayList<AccepteClient> listClientsConnected = null;
+    private Client myClient = null;
+    private BufferedReader buffin = null;
 
-	//Constructor
-	public AccepteClient (Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize)
-	{
-		this.clientSocketOnServer = clientSocketOnServer;
-		this.sf = sf;
-		this.serialize = serialize;
-		this.listClientsConnected = clientsConnected;
-	}
+    private ObjectOutputStream outStream = null;
+    private int validation = -1;
 
-	//overwrite the thread run()
-	@SuppressWarnings({ "unchecked", "deprecation" })
-	public void run()
-	{
-		try
-		{
-			outStream = new ObjectOutputStream(clientSocketOnServer.getOutputStream());
-			validate = new PrintWriter(clientSocketOnServer.getOutputStream());
-			inStream = new ObjectInputStream(clientSocketOnServer.getInputStream());
-			myClient = (Client) inStream.readObject();
+    //Constructor
+    public AccepteClient(Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize) {
+        this.clientSocketOnServer = clientSocketOnServer;
+        this.sf = sf;
+        this.serialize = serialize;
+        this.listClientsConnected = clientsConnected;
+    }
 
-			listOfClient = (ArrayList<Client>)(serialize.deSerializeObject());
+    //overwrite the thread run()
+    @SuppressWarnings({"unchecked", "deprecation"})
+    public void run() {
+        try {
+            outStream = new ObjectOutputStream(clientSocketOnServer.getOutputStream());
+            ObjectInputStream inStream = new ObjectInputStream(clientSocketOnServer.getInputStream());
+            myClient = (Client) inStream.readObject();
 
-			if (myClient.isExist())
-			{
-				//Controle si le client existe deja
-				for (Client clientRegistered : listOfClient)
-				{
-					if(clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
-					{
-						if(clientRegistered.getMdp().equals(myClient.getMdp()))
-						{
-							System.out.println("Mot de passe correct");
-							validation = 1;
+            ArrayList<Client> listOfClient = (ArrayList<Client>) (serialize.deSerializeObject());
 
-							//Affiche la confirmation du password dans le server
-							sf.createLabel("Password Validate");
-							break;
-						}
-						else
-						{
-							//Affiche l'échec du password
-							sf.createLabel("False Password");
-							System.out.println("Mot de passe incorrect");
-							validation = 0;
-							break;
-						}
-					}
-					validation = 0;
-				}
-			}
-			else
-			{
-				//Controle si le client existe deja
-				for (Client clientRegistered : listOfClient)
-				{
-					if(clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
-					{
-						validation = 2;
-						break;
-					}
-				}
+            if (myClient.isExist()) {
+                //Controle si le client existe deja
+                for (Client clientRegistered : listOfClient) {
+                    if (clientRegistered.getName().equalsIgnoreCase(myClient.getName())) {
+                        if (clientRegistered.getMdp().equals(myClient.getMdp())) {
+                            System.out.println("Mot de passe correct");
+                            validation = 1;
 
-				if (validation != 2)
-				{
-					Client newClient = new Client(myClient.getName(), myClient.getMdp());
-					listOfClient.add(newClient);
-					serialize.serializeObject(listOfClient);
-					validation = 1;
-				}
-			}
+                            //Affiche la confirmation du password dans le server
+							showMessage("System", "Password Validate");
+                            break;
+                        } else {
+                            //Affiche l'échec du password
+							showMessage("System", "Wrong password");
+                            System.out.println("Mot de passe incorrect");
+                            validation = 0;
+                            break;
+                        }
+                    }
+                    validation = 0;
+                }
+            } else {
+                //Controle si le client existe deja
+                for (Client clientRegistered : listOfClient) {
+                    if (clientRegistered.getName().equalsIgnoreCase(myClient.getName())) {
+                        validation = 2;
+                        break;
+                    }
+                }
 
-			outStream.writeInt(1);
-			outStream.flush();
-			
+                if (validation != 2) {
+                    Client newClient = new Client(myClient.getName(), myClient.getMdp());
+                    listOfClient.add(newClient);
+                    serialize.serializeObject(listOfClient);
+                    validation = 1;
+                }
+            }
+
+            outStream.writeInt(1);
+            outStream.flush();
 
 
-			//Si le client est validé
-			if (validation== 1)
-			{
-				this.listClientsConnected.add(this);
-				updateClientList();
-				try {
-					Object o;
-					while((o = inStream.readObject())!=null) // il attend le prochain objet que l'on lui envoie
-					{
-						//si un client nous envoie un message nous l'affichons
-						if(o instanceof Message) 
-						{
-							Message m = (Message)o;
-							//afficher le message sur la console du server
-							sf.createLabel(m.getClient().getName() + " : " + m.getMessage());
-							
-							//envoie le message a tout les clients qui sont connectés.
-							for (AccepteClient accepteClient : listClientsConnected) 
-							{
-								accepteClient.outStream.writeObject(m); //écrit dans gui du srv
-								accepteClient.outStream.flush();
-							}
-							
-						}
-						if(o instanceof CloseMyConnection) // si un client part
-						{
-							CloseMyConnection cmc = (CloseMyConnection)o;
-							if(myClient.getName().equals(cmc.getClient().getName())) {
-								System.out.println("je quitte tout");
-							}
-						}
-					}
-				}
-				catch(SocketException e) 
-				{
-					listClientsConnected.remove(this);
-					updateClientList();
-					System.out.println("Client disconnected");
-				}
-			}
-			else
-			{
-				clientSocketOnServer.close();
-				this.sleep(3000);
-				this.stop();
-			}
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		catch (ClassNotFoundException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+            //Si le client est validé
+            if (validation == 1) {
+                this.listClientsConnected.add(this);
+                updateClientList();
+                try {
+                    Object o;
+                    while ((o = inStream.readObject()) != null) {
+                        //si un client nous envoie un message nous l'affichons
+                        if (o instanceof Message) {
+                            Message m = (Message) o;
+							//sf.createLabel(m.getClient().getName() + " : " + m.getMessage());
+							showMessage(m.getClient().getName(), m.getMessage());
+                            for (AccepteClient accepteClient : listClientsConnected) {
+                                accepteClient.outStream.writeObject(m); //écrit dans gui du srv
+                                accepteClient.outStream.flush();
+                            }
 
-	//mis a jour de la liste des clinets
-	private void updateClientList() throws IOException 
-	{
+                        }
+                        if (o instanceof CloseMyConnection) {
+                            CloseMyConnection cmc = (CloseMyConnection) o;
+                            if (myClient.getName().equals(cmc.getClient().getName())) {
+                                System.out.println("je quitte tout");
+                            }
+                        }
+                    }
+                } catch (SocketException e) {
+                    listClientsConnected.remove(this);
+                    updateClientList();
+                    System.out.println("Client disconnected");
+                }
+                //ICI ON DOIT DONNER AU CLIENT QUI VIENT DE SE CONNECTER LA LISTE DES CLIENTS DEJA CO
+                //+ ON DOIT DONNER AUX CLIENTS DEJA CO LE NOUVEAU CONNECTE
+            } else {
+                clientSocketOnServer.close();
+                sleep(3000);
+                this.stop();
+            }
+        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+            e.printStackTrace();
+        } // TODO Auto-generated catch block
+        // TODO Auto-generated catch block
 
-		//parcuor la liste des client co , 
-		ArrayList<Client> alClient = new ArrayList<Client>();
-		for (AccepteClient accepteClient : listClientsConnected) {
-			alClient.add(accepteClient.myClient);
-		}
-		for (AccepteClient accepteClient : listClientsConnected) {
-			accepteClient.outStream.writeObject(alClient);
-			accepteClient.outStream.flush();
-		}
-		
-	}
+    }
+
+    private void updateClientList() throws IOException {
+
+        ArrayList<Client> alClient = new ArrayList<Client>();
+        for (AccepteClient accepteClient : listClientsConnected) {
+            alClient.add(accepteClient.myClient);
+        }
+        for (AccepteClient accepteClient : listClientsConnected) {
+            accepteClient.outStream.writeObject(alClient);
+            accepteClient.outStream.flush();
+        }
+
+    }
+	
+		private void showMessage(String sender, String msg) {
+
+            DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' HH:mm");
+
+            //Get formatted String
+            String dateFormated = formatDate.format(LocalDateTime.now());
+
+
+            sf.createLabel("(" + dateFormated  + ") " + sender + " : " + msg);
+    }
 }
