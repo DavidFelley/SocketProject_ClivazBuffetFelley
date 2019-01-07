@@ -9,12 +9,13 @@ import java.awt.event.ActionListener;
 public class ServerFrame {
 
     private JFrame frmServer;
-    private JPanel pnlInfoServer = new JPanel();
+    private static JPanel pnlInfoServer = new JPanel();
 
     /**
      * Create the application.
      */
-    public ServerFrame() {
+    public ServerFrame() 
+    {
         initialize();
     }
 
@@ -58,7 +59,7 @@ public class ServerFrame {
         frmServer.setVisible(true);
     }
 
-    public void createLabel(String message) {
+    public static void createLabel(String message) {
         JLabel lbl = new JLabel(message);
 
         pnlInfoServer.add(lbl);

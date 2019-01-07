@@ -493,8 +493,6 @@ public class ClientFrame {
         {
             sendMessage();
         }
-
-
     }
 
 	private void sendMessage() {
@@ -509,14 +507,16 @@ public class ClientFrame {
 	
     private class SelectionChanged implements ActionListener {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
             System.out.println("avant remove" + Arrays.toString(listOfFiles));
             model.removeAllElements(); //enl�ve l'affichage des fichiers dans la liste
 
             if (jcbobxForClient.getItemCount() > 0) { //si il y a quelque chose dans la liste
                 System.out.println("hello ma liste est plus grande que 0");
                 //remplissage du panel par rapport aux clients connecter.
-                for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) {
+                for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) 
+                {
                     System.out.println("nom du fichier" + myFile);
                     model.addElement(myFile);
                 }
@@ -528,19 +528,24 @@ public class ClientFrame {
     /*
      * ici on crꥠle c??"Client" du dl
      */
-    private class DownloadButtonClick implements ActionListener {
+    private class DownloadButtonClick implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
             String myFile = model.get(JlstFile.getSelectedIndex());
             System.out.println(myFile);
             Client target = listOfClients.get(jcbobxForClient.getSelectedIndex());
             FileRequest fr = new FileRequest(myFile, myClient, target);
 
-            new Thread(new Runnable() {
+            new Thread(new Runnable() 
+            {
                 @Override
-                public void run() {
+                public void run() 
+                {
                     //se connecter au server
-                    try {
+                    try 
+                    {
                         requestClient = new Socket(fr.getTarget().getIp(), 45001);
                         System.out.println(fr.getTarget().getIp());
                         inStreamRequestClient = requestClient.getInputStream();
@@ -549,7 +554,9 @@ public class ClientFrame {
                         System.out.println(4);
                         outStreamRequestClient.writeObject(fr);
                         Files.copy(inStreamRequestClient, Paths.get(directoryFiles + fr.getNameFile()));
-                    } catch (IOException e) {
+                    } 
+                    catch (IOException e) 
+                    {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
@@ -559,9 +566,12 @@ public class ClientFrame {
 
     }
     
-    private class KeySender extends KeyAdapter {
-    	public void keyPressed(KeyEvent e) {
-            if(e.getKeyCode() == KeyEvent.VK_ENTER){
+    private class KeySender extends KeyAdapter 
+    {
+    	public void keyPressed(KeyEvent e) 
+    	{
+            if(e.getKeyCode() == KeyEvent.VK_ENTER)
+            {
             	sendMessage();
             }
     	}

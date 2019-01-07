@@ -5,41 +5,53 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Server {
-    private ServerFrame sf;
-    private Socket clientSocket = null;
-    private Serialize serialize = new Serialize();
-    private ArrayList<AccepteClient> listClientsConnected = new ArrayList<>();
+public class Server 
+{
+	private ServerFrame sf;
+	private Socket clientSocket = null;
+	private Serialize serialize = new Serialize();
+	private ArrayList<AccepteClient> listClientsConnected = new ArrayList<>();
+	private Logging log = new Logging();
 
-    public Server() {
-        launch();
-    }
+	public Server() 
+	{
+		launch();
+	}
 
-    @SuppressWarnings("unchecked")
-    private void launch() {
-        //Initialise la frame
-        sf = new ServerFrame();
+	@SuppressWarnings("unchecked")
+	private void launch() 
+	{
+		//Initialise la frame
+		sf = new ServerFrame();
 
-        //cree les fichiers de sauvegarde utilisateurs si n'existent pas
-        serialize.createFile();
+		//Initialise le fichier de logs
+		log.createLogger();
 
-        ServerSocket mySkServer;
+		//cree les fichiers de sauvegarde utilisateurs si n'existent pas
+		serialize.createFile();
 
-        try {
-            mySkServer = new ServerSocket(45000, 5);
+		ServerSocket mySkServer;
 
-            //wait for a client connection
-            while (true) {
-                clientSocket = mySkServer.accept();
-                System.out.println("connection request received");
+		try 
+		{
+			mySkServer = new ServerSocket(45000, 5);
 
-                Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize);
-
-                //starting the thread
-                t.start();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+			//wait for a client connection
+			while (true) 
+			{
+				clientSocket = mySkServer.accept();
+				System.out.println("connection request received");
+				
+				log.write("Tentative de connection d'un client", "info");
+				Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize);
+				
+				//starting the thread
+				t.start();
+			}
+		} 
+		catch (IOException e) 
+		{
+			log.write(e.getMessage().toString(), "severe");
+		}
+	}
 }
