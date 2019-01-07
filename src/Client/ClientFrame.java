@@ -216,7 +216,8 @@ public class ClientFrame {
 
     /* Connection du client vers le server suivant les infos donn�e
      */
-    private void connect() throws IOException {
+    private void connect() throws IOException 
+    {
         String ipServer = jtxtfServer.getText();
         Socket clientSocket = new Socket(ipServer, 45000);
 
@@ -240,24 +241,32 @@ public class ClientFrame {
      * mise a jour de l'interface graphique du client par rapport au changement
      * nouveau message , nouveau liste de fichiers , nouveau client connect� , ...
      */
-    private void listenServer() {
-        new Thread(new Runnable() {
+    private void listenServer() 
+    {
+        new Thread(new Runnable() 
+        {
             @Override
-            public void run() {
-                while (true) {
-                    try {
+            public void run() 
+            {
+                while (true) 
+                {
+                    try 
+                    {
                         Object o = inStream.readObject();
                         /*
                          * si l'objet mis a jour est un message
                          * alors on met a jout le texte area
                          */
-                        if (o instanceof Message) {
+                        if (o instanceof Message) 
+                        {
                             Message m = (Message) o;
                             String sender;
                             //lors de l'envoie du message , si c'est nous qui envoyont le message nous voyons "Me" a la place de notre pseudo
                             if (m.getClient().getName().equals(myClient.getName())) {
                                 sender = "Me";
-                            } else {
+                            } 
+                            else 
+                            {
                                 sender = m.getClient().getName();
                             }
                             showNewMessage(sender, m.getMessage());
@@ -268,20 +277,26 @@ public class ClientFrame {
                          *liste des fichiers client (Loan)
                          */
 
-                        if (o instanceof ArrayList) {
-                            if (((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client) {
+                        if (o instanceof ArrayList) 
+                        {
+                            if (((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client) 
+                            {
                                 listOfClients = (ArrayList<Client>) o;
-                                if (jcbobxForClient.getItemCount() >= 1) {
+                                if (jcbobxForClient.getItemCount() >= 1) 
+                                {
                                     jcbobxForClient.removeAllItems();
                                 }
-                                for (Client thisClient : listOfClients) {
+                                for (Client thisClient : listOfClients) 
+                                {
                                     jcbobxForClient.addItem(thisClient);
                                     System.out.println(thisClient.getName());
                                     System.out.println(listOfClients);
                                 }
                             }
                         }
-                    } catch (IOException | ClassNotFoundException e) {
+                    } 
+                    catch (IOException | ClassNotFoundException e) 
+                    {
                         e.printStackTrace();
                     }
                 }
@@ -359,12 +374,14 @@ public class ClientFrame {
         txtAreaChat.append("[" + dateFormated  + "] " + sender + " : " + message + "\n");
     }
 
-    private void controleConnection(int value) {
-        switch (value) {
+    private void controleConnection(int value) 
+    {
+        switch (value) 
+        {
             case 0:
                 lblError.setText("Wrong user or password");
                 frame.repaint();
-                frame.validate();
+                frame.revalidate();
                 break;
             case 1:
                 addFileInList(myClient.getListOfFiles());
