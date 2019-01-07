@@ -194,9 +194,9 @@ public class ClientFrame {
         scrollChat.setViewportView(txtAreaChat);
 
         //Afin de faire des tests plsu rapidement nous mettons des donn�e en dur (mettre en commentaire par la suiste)
-        jtxtfServer.setText("192.168.43.242");
-        jtxtfLogin.setText("loan");
-        jtxtfPassword.setText("1234");
+        jtxtfServer.setText("192.168.1.143");
+        jtxtfLogin.setText("");
+        jtxtfPassword.setText("");
 
         DefaultCaret caret = (DefaultCaret) txtAreaChat.getCaret();
         caret.setUpdatePolicy(DefaultCaret.OUT_BOTTOM);
@@ -303,13 +303,15 @@ public class ClientFrame {
             }
         }).start();
 
-        new Thread(new Runnable() //Thread ꤨange fichier  , partie h??(le client qui poss饥 le fichier)
+        new Thread(new Runnable() //Thread d'�change fichier  , partie h??(le client qui poss�de le fichier)
         {
-            //donc ici je suis le client qui poss饥 le fichier
+            //donc ici je suis le client qui poss�de le fichier
             @Override
-            public void run() {
-                //crꢴion d'un socketsrv
-                try {
+            public void run() 
+            {
+                //cr�e�ion d'un socketsrv
+                try 
+                {
                     myHostClient = new ServerSocket(45001, 10, InetAddress.getByName(myClient.getIp()));
 
                     Object oClient = null;
@@ -322,15 +324,19 @@ public class ClientFrame {
                         inStreamClienttoClient = new ObjectInputStream(clientRequestSocket.getInputStream());
                         outStreamClienttoClient = clientRequestSocket.getOutputStream();
 
-                        try {
+                        try 
+                        {
                             // J'꤯ute si quelqu'un veut un fichier
                             oClient = inStreamClienttoClient.readObject();
-                        } catch (ClassNotFoundException | IOException e) {
+                        } 
+                        catch (ClassNotFoundException | IOException e) 
+                        {
                             e.printStackTrace();
                         }
                         //a tester si vraim,ent besoin de 2 inputstream diff곥nt
 
-                        if (oClient instanceof FileRequest) {
+                        if (oClient instanceof FileRequest) 
+                        {
                             FileRequest frClient = (FileRequest) oClient;
                             //Cherche le fichier correspondant
                             //on part du principe que le dossier d'envoie et le m뮥 que celui de reception
@@ -342,8 +348,10 @@ public class ClientFrame {
                             //rꤵp곡tion du fichier convoit顰ar le client "clientRequest"
                             File monFichier = null;
                             //prise du fichier dans le client qui correspond
-                            for (File f : dlDirectory.listFiles()) {
-                                if (f.getName().equals(frClient.getNameFile())) {
+                            for (File f : dlDirectory.listFiles()) 
+                            {
+                                if (f.getName().equals(frClient.getNameFile())) 
+                                {
                                     monFichier = f;
                                     break;
                                 }
@@ -354,7 +362,9 @@ public class ClientFrame {
                             clientRequestSocket.close();
                         }
                     }
-                } catch (IOException e1) {
+                } 
+                catch (IOException e1) 
+                {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
@@ -362,9 +372,8 @@ public class ClientFrame {
         }).start();
     }
 
-    private void showNewMessage(String sender, String message) {
-
-
+    private void showNewMessage(String sender, String message) 
+    {
         DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("HH:mm");
 
         //Get formatted String
@@ -456,26 +465,32 @@ public class ClientFrame {
         }
     }
 
-    class addFile implements ActionListener {
+    class addFile implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
             int resultat = myJfileChooser.showOpenDialog(pnlServer);
 
-            if (resultat == JFileChooser.CANCEL_OPTION) {
+            if (resultat == JFileChooser.CANCEL_OPTION) 
+            {
                 myJfileChooser.cancelSelection();
                 return;
             }
 
-            if (resultat == JFileChooser.APPROVE_OPTION) {
+            if (resultat == JFileChooser.APPROVE_OPTION) 
+            {
                 saveToDirectory(myJfileChooser.getSelectedFile().getAbsolutePath());
                 pnlSharedFiles.add(pnlListShared, BorderLayout.CENTER);
             }
         }
     }
 
-    private class sendMessage implements ActionListener {
+    private class sendMessage implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
             sendMessage();
         }
 

@@ -119,46 +119,56 @@ public class AccepteClient extends Thread {
                             }
 
                         }
-                        if (o instanceof CloseMyConnection) {
+                        if (o instanceof CloseMyConnection) 
+                        {
                             CloseMyConnection cmc = (CloseMyConnection) o;
-                            if (myClient.getName().equals(cmc.getClient().getName())) {
+                            if (myClient.getName().equals(cmc.getClient().getName())) 
+                            {
                                 System.out.println("je quitte tout");
                             }
                         }
                     }
-                } catch (SocketException e) {
+                } 
+                catch (SocketException e) 
+                {
                     listClientsConnected.remove(this);
                     updateClientList();
                     System.out.println("Client disconnected");
                 }
-                //ICI ON DOIT DONNER AU CLIENT QUI VIENT DE SE CONNECTER LA LISTE DES CLIENTS DEJA CO
-                //+ ON DOIT DONNER AUX CLIENTS DEJA CO LE NOUVEAU CONNECTE
-            } else {
+            } 
+            else 
+            {
                 clientSocketOnServer.close();
                 sleep(3000);
                 this.stop();
             }
-        } catch (IOException | ClassNotFoundException | InterruptedException e) {
+        } 
+        catch (IOException | ClassNotFoundException | InterruptedException e)
+        {
             e.printStackTrace();
         } // TODO Auto-generated catch block
         // TODO Auto-generated catch block
 
     }
 
-    private void updateClientList() throws IOException {
+    private void updateClientList() throws IOException 
+    {
 
         ArrayList<Client> alClient = new ArrayList<Client>();
-        for (AccepteClient accepteClient : listClientsConnected) {
+        for (AccepteClient accepteClient : listClientsConnected) 
+        {
             alClient.add(accepteClient.myClient);
         }
-        for (AccepteClient accepteClient : listClientsConnected) {
+        for (AccepteClient accepteClient : listClientsConnected) 
+        {
             accepteClient.outStream.writeObject(alClient);
             accepteClient.outStream.flush();
         }
 
     }
 	
-		private void showMessage(String sender, String msg) {
+		private void showMessage(String sender, String msg) 
+		{
 
             DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' HH:mm");
 
