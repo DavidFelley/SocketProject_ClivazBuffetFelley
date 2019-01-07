@@ -46,6 +46,17 @@ public class Logging
 
 	public void write(String text, String severity) 
 	{
+		try 
+		{
+			fh = new FileHandler(path,true);
+		} 
+		catch (SecurityException | IOException e) 
+		{
+			e.printStackTrace();
+		}
+		
+		myLogger.addHandler(fh);
+		
 		if (severity.equals("info")) 
 		{
 			myLogger.setLevel(Level.INFO);
