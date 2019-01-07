@@ -48,7 +48,7 @@ public class Logging
 	{
 		try 
 		{
-			fh = new FileHandler(path,true);
+			fh = new FileHandler("/"+path,true);
 		} 
 		catch (SecurityException | IOException e) 
 		{
