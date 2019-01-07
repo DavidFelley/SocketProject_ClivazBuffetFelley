@@ -147,7 +147,7 @@ public class AccepteClient extends Thread
 			else 
 			{
 				clientSocketOnServer.close();
-				log.write(myClient.getName()+" déconnecté", "info");
+				log.write("Connection fermée", "info");
 				sleep(3000);
 				this.stop();
 			}
