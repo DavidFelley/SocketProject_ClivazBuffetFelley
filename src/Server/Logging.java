@@ -44,10 +44,7 @@ public class Logging
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	public void write(String text, String severity) 
-	{
+		
 		try 
 		{
 			fh = new FileHandler("./"+path,true);
@@ -60,7 +57,10 @@ public class Logging
 		myLogger.addHandler(fh);
 		SimpleFormatter formater = new SimpleFormatter();
 		fh.setFormatter(formater);
-		
+	}
+
+	public void write(String text, String severity) 
+	{		
 		if (severity.equals("info")) 
 		{
 			myLogger.setLevel(Level.INFO);
