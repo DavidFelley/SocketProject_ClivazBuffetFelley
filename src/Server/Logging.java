@@ -22,6 +22,7 @@ public class Logging
 
 	public void createLogger() 
 	{
+		myLogger = Logger.getLogger("Logger");
 		getMonth = cal.get(cal.MONTH)+1;
 		getYear = cal.get(cal.YEAR);
 
