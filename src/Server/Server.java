@@ -43,7 +43,7 @@ public class Server
 				System.out.println("connection request received");
 				
 				log.write("Tentative de connection d'un client", "info");
-				Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize);
+				Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize, log);
 				
 				//starting the thread
 				t.start();
