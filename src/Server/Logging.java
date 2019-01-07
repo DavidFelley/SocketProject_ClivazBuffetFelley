@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Logging 
 {
@@ -56,6 +57,8 @@ public class Logging
 		}
 		
 		myLogger.addHandler(fh);
+		SimpleFormatter formater = new SimpleFormatter();
+		fh.setFormatter(formater);
 		
 		if (severity.equals("info")) 
 		{
