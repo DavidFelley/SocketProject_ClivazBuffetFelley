@@ -54,7 +54,7 @@ public class AccepteClient extends Thread
 				{
 					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
 					{
-						log.write(myClient.getName()+"reconnu", "info");
+						log.write(myClient.getName()+" reconnu", "info");
 						if (clientRegistered.getMdp().equals(myClient.getMdp()))
 						{
 							log.write("Mot de passe validé, connection validée", "info");
@@ -75,7 +75,6 @@ public class AccepteClient extends Thread
 						}
 					}
 					validation = 0;
-					log.write(myClient.getName()+"non reconnu, connection refusée", "info");
 				}
 			} 
 			else 
@@ -85,7 +84,7 @@ public class AccepteClient extends Thread
 				{
 					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName())) 
 					{
-						log.write(myClient.getName()+"existe déjà, connection refusée", "info");
+						log.write(myClient.getName()+" existe déjà, connection refusée", "info");
 						validation = 2;
 						break;
 					}
@@ -93,7 +92,7 @@ public class AccepteClient extends Thread
 				if (validation != 2) 
 				{
 					Client newClient = new Client(myClient.getName(), myClient.getMdp());
-					log.write(myClient.getName()+"créé, connection validée", "info");
+					log.write(myClient.getName()+" créé, connection validée", "info");
 					listOfClient.add(newClient);
 					serialize.serializeObject(listOfClient);
 					validation = 1;
