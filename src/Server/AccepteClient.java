@@ -24,12 +24,13 @@ public class AccepteClient extends Thread
 	private int validation = -1;
 
 	//Constructor
-	public AccepteClient(Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize) 
+	public AccepteClient(Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize, Logging log) 
 	{
 		this.clientSocketOnServer = clientSocketOnServer;
 		this.sf = sf;
 		this.serialize = serialize;
 		this.listClientsConnected = clientsConnected;
+		this.log = log;
 	}
 
 	//overwrite the thread run()
