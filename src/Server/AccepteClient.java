@@ -102,7 +102,6 @@ public class AccepteClient extends Thread
 			outStream.writeInt(validation);
 			outStream.flush();
 
-
 			//Si le client est validé
 			if (validation == 1) 
 			{
@@ -113,6 +112,7 @@ public class AccepteClient extends Thread
 					Object o;
 					while ((o = inStream.readObject()) != null) 
 					{
+						
 						//si un client nous envoie un message nous l'affichons
 						if (o instanceof Message) 
 						{
@@ -158,9 +158,9 @@ public class AccepteClient extends Thread
 		} 
 	}
 
+
 	private void updateClientList() throws IOException 
 	{
-
 		ArrayList<Client> alClient = new ArrayList<Client>();
 		for (AccepteClient accepteClient : listClientsConnected) 
 		{
@@ -171,17 +171,14 @@ public class AccepteClient extends Thread
 			accepteClient.outStream.writeObject(alClient);
 			accepteClient.outStream.flush();
 		}
-
 	}
 
 	private void showMessage(String sender, String msg) 
 	{
-
 		DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' HH:mm");
 
 		//Get formatted String
 		String dateFormated = formatDate.format(LocalDateTime.now());
-
 
 		sf.createLabel("(" + dateFormated  + ") " + sender + " : " + msg);
 	}

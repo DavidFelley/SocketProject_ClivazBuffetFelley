@@ -315,11 +315,12 @@ public class ClientFrame {
                     myHostClient = new ServerSocket(45001, 10, InetAddress.getByName(myClient.getIp()));
 
                     Object oClient = null;
-                    while (true) {
+                    while (true) 
+                    {
                         /*
                          *  Crꢴion du server pour l'hote du fichier
                          */
-
+                    	
                         clientRequestSocket = myHostClient.accept();
                         inStreamClienttoClient = new ObjectInputStream(clientRequestSocket.getInputStream());
                         outStreamClienttoClient = clientRequestSocket.getOutputStream();
@@ -428,15 +429,18 @@ public class ClientFrame {
     }
 
     private void saveToDirectory(String path) {
-        try {
+        try 
+        {
             File file = new File(path);
             Path sourceDirectory = Paths.get(path);
             Path targetDirectory = Paths.get(directoryFiles + file.getName());
 
             //copy source to target using Files Class
             Files.copy(sourceDirectory, targetDirectory);
+            getListOfFiles();
 
-        } catch (Exception e) {
+        } catch (Exception e) 
+        {
             e.printStackTrace();
         }
     }
@@ -495,17 +499,22 @@ public class ClientFrame {
         }
     }
 
-	private void sendMessage() {
-		try {
+	private void sendMessage() 
+	{
+		try 
+		{
             outStream.writeObject(new Message(txtFMsgSend.getText(), myClient));
             outStream.flush();
             txtFMsgSend.setText("");
-        } catch (IOException e1) {
+        } 
+		catch (IOException e1) 
+		{
             e1.printStackTrace();
         }
 	}
 	
-    private class SelectionChanged implements ActionListener {
+    private class SelectionChanged implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent e) 
         {
