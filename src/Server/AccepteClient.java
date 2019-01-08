@@ -115,8 +115,12 @@ public class AccepteClient extends Thread
 						if(o instanceof String [])
 						{
 							String[] newList = (String[]) o;
-							this.myClient.setListOfFiles(newList);
-							updateClientList();
+							myClient.setListOfFiles(newList);
+							
+							for (AccepteClient client : listClientsConnected) 
+							{
+								client.listClientsConnected.add(this);
+							}
 						}
 						
 						//si un client nous envoie un message nous l'affichons
