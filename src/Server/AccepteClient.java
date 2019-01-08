@@ -115,17 +115,7 @@ public class AccepteClient extends Thread
 						if(o instanceof String [])
 						{
 							String[] newList = (String[]) o;
-							myClient.setListOfFiles(newList);
-							// AJOUT DU THREAD DANS LE TABLEAU A LA PLACE DE LUI MEME
-							for (AccepteClient client : listClientsConnected) 
-							{
-								if(client == this)
-									client = this;
-							}
-							
-							updateClientList();
-							
-							System.out.println("ON EST PASSE PAR LA MAGGLE");
+							this.myClient.setListOfFiles(newList);
 						}
 						
 						//si un client nous envoie un message nous l'affichons
