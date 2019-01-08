@@ -206,7 +206,8 @@ public class ClientFrame {
     }
 
     /* ajout de chaque fichier dans le dossier dans une liste*/
-    private void addFileInList(String[] listOfFiles) {
+    private void addFileInList(String[] listOfFiles) 
+    {
         for (String listOfFile : listOfFiles) {
             JLabel lblfileName = new JLabel(listOfFile);
             pnlListShared.add(lblfileName);
@@ -443,6 +444,9 @@ public class ClientFrame {
             
             newListOfFile = getListOfFiles();
             outStream.writeObject(newListOfFile);
+            pnlListShared.repaint();
+            pnlListShared.revalidate();
+            
         } 
         catch (Exception e) 
         {
@@ -450,9 +454,11 @@ public class ClientFrame {
         }
     }
 
-    class LoginClick implements ActionListener {
+    class LoginClick implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
             try {
                 exist = true;
                 connect();
@@ -577,7 +583,6 @@ public class ClientFrame {
                 }
             }).start();
         }
-
     }
     
     private class KeySender extends KeyAdapter 
