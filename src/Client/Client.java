@@ -51,10 +51,18 @@ public class Client implements Serializable
 	{
 		return listOfFiles;
 	}
-
-	public void setListOfFiles(String[] listOfFiles) 
+	
+	public void affichefile()
 	{
-		this.listOfFiles = listOfFiles;
+		for (int i = 0; i < listOfFiles.length; i++) 
+		{
+			System.out.println(listOfFiles[i]);
+		}
+	}
+
+	public void setListOfFiles(String[] newListOfFiles) 
+	{
+		this.listOfFiles = newListOfFiles;
 	}
 	
 	@Override

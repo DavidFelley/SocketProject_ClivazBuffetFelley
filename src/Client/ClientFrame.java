@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class ClientFrame {
     //Variables of connection
@@ -247,7 +248,8 @@ public class ClientFrame {
     {
         new Thread(new Runnable() 
         {
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             public void run() 
             {
                 while (true) 
@@ -281,9 +283,15 @@ public class ClientFrame {
 
                         if (o instanceof ArrayList) 
                         {
-                            if (((ArrayList) o).size() > 0 && ((ArrayList) o).get(0) instanceof Client) 
+                            if (((ArrayList) o).size() > 0) 
                             {
-                                listOfClients = (ArrayList<Client>) o;
+                            	listOfClients = (ArrayList<Client>) o;
+                            	
+                            	for (Client client : listOfClients) 
+                            	{
+									client.affichefile();
+								}
+
                                 if (jcbobxForClient.getItemCount() >= 1) 
                                 {
                                     jcbobxForClient.removeAllItems();
@@ -292,7 +300,7 @@ public class ClientFrame {
                                 {
                                     jcbobxForClient.addItem(thisClient);
                                     System.out.println(thisClient.getName());
-                                    System.out.println(listOfClients);
+                                    System.out.println(thisClient.getListOfFiles());
                                 }
                             }
                         }
@@ -446,10 +454,7 @@ public class ClientFrame {
             
             newListOfFile = getListOfFiles();
             outStream.writeObject(newListOfFile);
-            outStream.flush();
-            pnlListShared.repaint();
-            pnlListShared.revalidate();
-            
+            outStream.flush();            
         } 
         catch (Exception e) 
         {
@@ -471,13 +476,17 @@ public class ClientFrame {
         }
     }
 
-    class SignInClick implements ActionListener {
+    class SignInClick implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
+        public void actionPerformed(ActionEvent e) 
+        {
+            try 
+            {
                 exist = false;
                 connect();
-            } catch (IOException e1) {
+            } catch (IOException e1) 
+            {
                 e1.printStackTrace();
             }
         }
@@ -545,6 +554,18 @@ public class ClientFrame {
                 }
                 System.out.println(Arrays.toString(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()));
             }
+        }
+    }
+    
+    private class TestReload implements ActionListener 
+    {
+        @Override
+        public void actionPerformed(ActionEvent e) 
+        {
+        	for (int i = 0; i < listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles().length; i++) 
+        	{
+				System.out.println(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()[i]);
+			}
         }
     }
 

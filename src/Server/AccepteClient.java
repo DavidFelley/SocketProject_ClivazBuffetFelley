@@ -10,6 +10,7 @@ import java.net.SocketException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class AccepteClient extends Thread 
 {
@@ -105,7 +106,7 @@ public class AccepteClient extends Thread
 			//Si le client est validé
 			if (validation == 1) 
 			{
-				this.listClientsConnected.add(this);
+				listClientsConnected.add(this);
 				updateClientList();
 				try 
 				{
@@ -114,7 +115,7 @@ public class AccepteClient extends Thread
 					{					
 						if(o instanceof String [])
 						{
-							String[] newList = (String[]) o;
+							String[] newList = (String[]) o;		
 							myClient.setListOfFiles(newList);
 							updateFileClient();
 						}
@@ -147,7 +148,6 @@ public class AccepteClient extends Thread
 					log.write(e.getMessage().toString(), "warning");
 					listClientsConnected.remove(this);
 					updateClientList();
-
 				}
 			} 
 			else 
@@ -180,18 +180,20 @@ public class AccepteClient extends Thread
 	
 	private void updateFileClient() throws IOException 
 	{
-		ArrayList<Client> alClient = new ArrayList<Client>();
-		for (AccepteClient accepteClient : listClientsConnected) 
-		{
-			if(accepteClient.myClient != myClient)
-				alClient.add(accepteClient.myClient);
+		ArrayList<Client> ClientAddFile = new ArrayList<Client>();
+		for (AccepteClient clientConnected : listClientsConnected) 
+		{			
+			if(clientConnected.myClient != myClient)
+				ClientAddFile.add(clientConnected.myClient);
 			else
-				alClient.add(myClient);
+				ClientAddFile.add(myClient);
 		}
-		for (AccepteClient accepteClient : listClientsConnected) 
+		
+		for (AccepteClient client : listClientsConnected) 
 		{
-			accepteClient.outStream.writeObject(alClient);
-			accepteClient.outStream.flush();
+			client.outStream.reset();
+			client.outStream.writeObject(ClientAddFile);
+			client.outStream.flush();
 		}
 	}
 
