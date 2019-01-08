@@ -111,13 +111,15 @@ public class AccepteClient extends Thread
 				{
 					Object o;
 					while ((o = inStream.readObject()) != null) 
-					{
+					{					
 						if(o instanceof String [])
 						{
 							String[] newList = (String[]) o;
 							myClient.setListOfFiles(newList);
 							System.out.println("ON EST PASSE PAR LA MAGGLE");
+							updateClientList();
 						}
+						
 						//si un client nous envoie un message nous l'affichons
 						if (o instanceof Message) 
 						{
