@@ -189,12 +189,12 @@ public class AccepteClient extends Thread
 		
 		for (AccepteClient client : listClientsConnected) 
 		{
-//			if(client != this)
-//			{
+			if(client != this)
+			{
 				client.outStream.reset();
 				client.outStream.writeObject(ClientAddFile);
 				client.outStream.flush();
-//			}
+			}
 		}
 	}
 
