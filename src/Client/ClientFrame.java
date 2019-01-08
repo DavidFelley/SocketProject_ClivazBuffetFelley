@@ -422,6 +422,7 @@ public class ClientFrame {
         {
             directory.mkdir(); //cr�ation du dossier
         }
+        
         String[] files = new String[directory.list().length];
         File[] lst = directory.listFiles();
 
@@ -429,6 +430,7 @@ public class ClientFrame {
         {
             files[i] = lst[i].getName();
         }
+        
         return files;
     }
 
@@ -444,6 +446,7 @@ public class ClientFrame {
             
             newListOfFile = getListOfFiles();
             outStream.writeObject(newListOfFile);
+            outStream.flush();
             pnlListShared.repaint();
             pnlListShared.revalidate();
             
