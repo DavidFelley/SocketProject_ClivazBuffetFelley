@@ -21,7 +21,7 @@ public class AccepteClient extends Thread
 	private BufferedReader buffin = null;
 	private Logging log;
 	private ObjectOutputStream outStream = null;
-	private int validation = -1;
+	private int validation = 0;
 
 	//Constructor
 	public AccepteClient(Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize, Logging log) 
@@ -116,11 +116,7 @@ public class AccepteClient extends Thread
 						{
 							String[] newList = (String[]) o;
 							myClient.setListOfFiles(newList);
-							
-							for (AccepteClient client : listClientsConnected) 
-							{
-								client.listClientsConnected.add(this);
-							}
+							updateFileClient();
 						}
 						
 						//si un client nous envoie un message nous l'affichons
@@ -174,6 +170,23 @@ public class AccepteClient extends Thread
 		for (AccepteClient accepteClient : listClientsConnected) 
 		{
 			alClient.add(accepteClient.myClient);
+		}
+		for (AccepteClient accepteClient : listClientsConnected) 
+		{
+			accepteClient.outStream.writeObject(alClient);
+			accepteClient.outStream.flush();
+		}
+	}
+	
+	private void updateFileClient() throws IOException 
+	{
+		ArrayList<Client> alClient = new ArrayList<Client>();
+		for (AccepteClient accepteClient : listClientsConnected) 
+		{
+			if(accepteClient.myClient != myClient)
+				alClient.add(accepteClient.myClient);
+			else
+				alClient.add(myClient);
 		}
 		for (AccepteClient accepteClient : listClientsConnected) 
 		{

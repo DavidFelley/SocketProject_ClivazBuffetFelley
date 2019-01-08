@@ -50,3 +50,51 @@ janv. 08, 2019 10:27:12 AM Server.Logging write
 INFOS: loan reconnu
 janv. 08, 2019 10:27:12 AM Server.Logging write
 INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 1:21:33 PM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 08, 2019 1:21:33 PM Server.Logging write
+INFOS: david reconnu
+janv. 08, 2019 1:21:33 PM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 1:22:11 PM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 08, 2019 1:22:11 PM Server.Logging write
+INFOS: david reconnu
+janv. 08, 2019 1:22:11 PM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 1:23:00 PM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 08, 2019 1:23:00 PM Server.Logging write
+INFOS: david reconnu
+janv. 08, 2019 1:23:00 PM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 1:23:29 PM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 08, 2019 1:23:29 PM Server.Logging write
+INFOS: david reconnu
+janv. 08, 2019 1:23:29 PM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 1:23:29 PM Server.Logging write
+GRAVE: Connection reset by peer: socket write error
+janv. 08, 2019 1:23:46 PM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 08, 2019 1:23:46 PM Server.Logging write
+INFOS: david reconnu
+janv. 08, 2019 1:23:46 PM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 1:23:51 PM Server.Logging write
+AVERTISSEMENT: Connection reset
+janv. 08, 2019 1:25:37 PM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 08, 2019 1:25:37 PM Server.Logging write
+INFOS: david reconnu
+janv. 08, 2019 1:25:37 PM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 2:02:13 PM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 08, 2019 2:02:13 PM Server.Logging write
+INFOS: david reconnu
+janv. 08, 2019 2:02:13 PM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 08, 2019 2:02:31 PM Server.Logging write
+AVERTISSEMENT: Connection reset
