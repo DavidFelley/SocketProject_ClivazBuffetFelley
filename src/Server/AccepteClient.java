@@ -116,6 +116,7 @@ public class AccepteClient extends Thread
 						{
 							String[] newList = (String[]) o;
 							this.myClient.setListOfFiles(newList);
+							updateClientList();
 						}
 						
 						//si un client nous envoie un message nous l'affichons
