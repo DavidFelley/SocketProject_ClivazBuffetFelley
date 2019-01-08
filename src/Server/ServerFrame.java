@@ -22,7 +22,8 @@ public class ServerFrame {
     /**
      * Initialize the contents of the frame.
      */
-    private void initialize() {
+    private void initialize() 
+    {
         frmServer = new JFrame();
         frmServer.setResizable(false);
         frmServer.setTitle("SERVER");

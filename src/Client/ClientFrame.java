@@ -19,8 +19,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import javax.swing.border.BevelBorder;
 
-public class ClientFrame {
+public class ClientFrame 
+{
+	
     //Variables of connection
     private Client myClient = null;
     private String[] listOfFiles = null;
@@ -29,8 +32,8 @@ public class ClientFrame {
     private ServerSocket myHostClient = null;
     private ObjectOutputStream outStream = null;
     private OutputStream outStreamClienttoClient = null;
-    private ObjectInputStream inStream = null; // discution avec le server
-    private ObjectInputStream inStreamClienttoClient = null; // discussion avec le client pour le dl
+    private ObjectInputStream inStream = null;
+    private ObjectInputStream inStreamClienttoClient = null;
     private JFileChooser myJfileChooser = new JFileChooser();
     private ArrayList<Client> listOfClients = new ArrayList<>();
     private Socket requestClient;
@@ -55,6 +58,7 @@ public class ClientFrame {
     private JTextArea txtAreaChat;
     private DefaultListModel<String> model;
     private JList<String> JlstFile;
+    private JLabel lblErrorServer;
 
     /**
      * Create the application.
@@ -78,64 +82,78 @@ public class ClientFrame {
 
         JPanel panelLogin = new JPanel();
         pnlMain.add(panelLogin, "panelLogin");
-        panelLogin.setBackground(Color.DARK_GRAY);
+        panelLogin.setBackground(Color.LIGHT_GRAY);
         panelLogin.setLayout(null);
 
         jtxtfLogin = new JTextField();
+        jtxtfLogin.setSelectedTextColor(Color.WHITE);
+        jtxtfLogin.setSelectionColor(Color.BLUE);
+        jtxtfLogin.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         jtxtfLogin.setBounds(332, 78, 330, 22);
         panelLogin.add(jtxtfLogin);
         jtxtfLogin.setColumns(10);
 
         jtxtfServer = new JTextField();
+        jtxtfServer.setSelectedTextColor(Color.WHITE);
+        jtxtfServer.setSelectionColor(Color.BLUE);
+        jtxtfServer.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         jtxtfServer.setBounds(332, 396, 330, 22);
         panelLogin.add(jtxtfServer);
         jtxtfServer.setColumns(10);
 
         jtxtfPassword = new JPasswordField();
+        jtxtfPassword.setSelectedTextColor(Color.WHITE);
+        jtxtfPassword.setSelectionColor(Color.BLUE);
+        jtxtfPassword.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         jtxtfPassword.setBounds(332, 237, 330, 22);
         panelLogin.add(jtxtfPassword);
 
         JLabel lblLogin = new JLabel("Login");
-        lblLogin.setForeground(Color.RED);
-        lblLogin.setFont(new Font("Tahoma", Font.BOLD, 20));
+        lblLogin.setBackground(Color.GRAY);
+        lblLogin.setForeground(Color.BLACK);
+        lblLogin.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 20));
         lblLogin.setBounds(332, 43, 191, 34);
         panelLogin.add(lblLogin);
 
         JLabel lblPassword = new JLabel("Password");
-        lblPassword.setForeground(Color.RED);
-        lblPassword.setFont(new Font("Tahoma", Font.BOLD, 20));
+        lblPassword.setForeground(Color.BLACK);
+        lblPassword.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 20));
         lblPassword.setBounds(332, 208, 191, 16);
         panelLogin.add(lblPassword);
 
         JLabel lblServerIp = new JLabel("Server IP");
-        lblServerIp.setForeground(Color.RED);
-        lblServerIp.setFont(new Font("Tahoma", Font.BOLD, 20));
+        lblServerIp.setForeground(Color.BLACK);
+        lblServerIp.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 20));
         lblServerIp.setBounds(332, 367, 191, 16);
         panelLogin.add(lblServerIp);
 
         JButton btnLogin = new JButton("Login");
-        btnLogin.setForeground(Color.WHITE);
-        btnLogin.setBackground(Color.RED);
+        btnLogin.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, Color.BLACK, new Color(255, 255, 255), new Color(0, 0, 0)));
+        btnLogin.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 15));
+        btnLogin.setForeground(Color.BLACK);
+        btnLogin.setBackground(Color.LIGHT_GRAY);
         btnLogin.setBounds(266, 528, 97, 25);
         btnLogin.addActionListener(new LoginClick());
         panelLogin.add(btnLogin);
 
         JButton btnSignIn = new JButton("Sign in");
-        btnSignIn.setBackground(Color.RED);
-        btnSignIn.setForeground(Color.WHITE);
+        btnSignIn.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, Color.BLACK, Color.WHITE, Color.BLACK));
+        btnSignIn.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
+        btnSignIn.setBackground(Color.LIGHT_GRAY);
+        btnSignIn.setForeground(Color.BLACK);
         btnSignIn.setBounds(629, 528, 97, 25);
         btnSignIn.addActionListener(new SignInClick());
         panelLogin.add(btnSignIn);
 
         lblError = new JLabel("", SwingConstants.CENTER);
-        lblError.setFont(new Font("Tahoma", Font.BOLD, 13));
-        lblError.setForeground(Color.RED);
+        lblError.setFont(new Font("Arial", Font.PLAIN, 13));
+        lblError.setForeground(Color.BLACK);
         lblError.setBounds(236, 458, 522, 22);
         panelLogin.add(lblError);
 
         pnlServer = new JPanel();
         pnlMain.add(pnlServer, "panelServer");
-        pnlServer.setBackground(Color.DARK_GRAY);
+        pnlServer.setBackground(Color.LIGHT_GRAY);
         pnlServer.setLayout(null);
 
         JPanel panelFiles = new JPanel();
@@ -144,12 +162,17 @@ public class ClientFrame {
         panelFiles.setLayout(new BorderLayout(0, 0));
 
         jcbobxForClient = new JComboBox<String>();
+        jcbobxForClient.setBackground(Color.WHITE);
+        jcbobxForClient.setFont(new Font("MS Reference Sans Serif", Font.BOLD, 13));
         jcbobxForClient.addActionListener(new SelectionChanged());
         panelFiles.add(jcbobxForClient, BorderLayout.NORTH);
 
         model = new DefaultListModel<>();
 
         JlstFile = new JList<>(model);
+        JlstFile.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
+        JlstFile.setSelectionBackground(Color.BLUE);
+        JlstFile.setSelectionForeground(Color.WHITE);
         panelFiles.add(JlstFile, BorderLayout.CENTER);
 
         pnlSharedFiles = new JPanel();
@@ -158,31 +181,53 @@ public class ClientFrame {
         pnlSharedFiles.setLayout(new BorderLayout(10, 0));
 
         JPanel panel = new JPanel();
+        panel.setFont(new Font("MS Reference Sans Serif", Font.BOLD, 13));
+        panel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        panel.setForeground(new Color(0, 0, 0));
+        panel.setBackground(Color.WHITE);
         pnlSharedFiles.add(panel, BorderLayout.NORTH);
 
         JLabel lblSharedFiles = new JLabel("My shared files");
-        lblSharedFiles.setFont(new Font("Tahoma", Font.BOLD, 13));
+        lblSharedFiles.setFont(new Font("MS Reference Sans Serif", Font.BOLD, 13));
         panel.add(lblSharedFiles);
 
         pnlListShared = new JPanel();
+        pnlListShared.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
+        pnlListShared.setBackground(Color.WHITE);
         pnlSharedFiles.add(pnlListShared, BorderLayout.CENTER);
 
         JButton btnAddFile = new JButton("Add File");
+        btnAddFile.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, Color.BLACK, Color.WHITE, Color.BLACK));
+        btnAddFile.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
+        btnAddFile.setBackground(Color.LIGHT_GRAY);
+        btnAddFile.setForeground(Color.BLACK);
         btnAddFile.addActionListener(new addFile());
         btnAddFile.setBounds(731, 448, 97, 25);
         pnlServer.add(btnAddFile);
 
         JButton btnDownload = new JButton("Download");
+        btnDownload.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, Color.BLACK, Color.WHITE, Color.BLACK));
+        btnDownload.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        btnDownload.setBackground(Color.LIGHT_GRAY);
+        btnDownload.setForeground(Color.BLACK);
+        btnDownload.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         btnDownload.addActionListener(new DownloadButtonClick());
         btnDownload.setBounds(12, 448, 97, 25);
         pnlServer.add(btnDownload);
 
         JButton btnSend = new JButton("Send");
+        btnSend.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, Color.BLACK, Color.WHITE, Color.BLACK));
+        btnSend.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
+        btnSend.setBackground(Color.LIGHT_GRAY);
+        btnSend.setForeground(Color.BLACK);
         btnSend.addActionListener(new sendMessage());
-        btnSend.setBounds(632, 449, 89, 23);
+        btnSend.setBounds(634, 449, 89, 23);
         pnlServer.add(btnSend);
 
         txtFMsgSend = new JTextField();
+        txtFMsgSend.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
+        txtFMsgSend.setSelectedTextColor(Color.WHITE);
+        txtFMsgSend.setSelectionColor(Color.BLUE);
         txtFMsgSend.addKeyListener(new KeySender());
         txtFMsgSend.setBounds(272, 448, 350, 22);
         pnlServer.add(txtFMsgSend);
@@ -193,11 +238,20 @@ public class ClientFrame {
         pnlServer.add(scrollChat);
 
         txtAreaChat = new JTextArea();
+        txtAreaChat.setSelectedTextColor(Color.WHITE);
+        txtAreaChat.setSelectionColor(Color.BLUE);
+        txtAreaChat.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         txtAreaChat.setEditable(false); //pour ne pas editer le chat
         scrollChat.setViewportView(txtAreaChat);
+        
+        lblErrorServer = new JLabel("", SwingConstants.CENTER);
+        lblErrorServer.setForeground(Color.BLACK);
+        lblErrorServer.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
+        lblErrorServer.setBounds(236, 523, 522, 22);
+        pnlServer.add(lblErrorServer);
 
         //Afin de faire des tests plsu rapidement nous mettons des donn�e en dur (mettre en commentaire par la suiste)
-        jtxtfServer.setText("192.168.1.143");
+        jtxtfServer.setText("");
         jtxtfLogin.setText("");
         jtxtfPassword.setText("");
 
@@ -227,15 +281,28 @@ public class ClientFrame {
 
     /* Connection du client vers le server suivant les infos donn�e
      */
-    private void connect() throws IOException 
+    private void connect()
     {
         String ipServer = jtxtfServer.getText();
-        Socket clientSocket = new Socket(ipServer, 45000);
+        Socket clientSocket;
+        String ipClient = "";
+        
+		try 
+		{
+			clientSocket = new Socket(ipServer, 45000);
+		
 
-        String ipClient = clientSocket.getLocalAddress().getHostAddress();
+        ipClient = clientSocket.getLocalAddress().getHostAddress();
         inStream = new ObjectInputStream(clientSocket.getInputStream());
         outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-
+        
+		} 
+		catch (IOException e) 
+		{
+			lblError.setText("Unable to reach the server!");
+            frame.repaint();
+            frame.validate();
+		}
         String login = jtxtfLogin.getText();
         String password = jtxtfPassword.getText();
 
@@ -243,9 +310,16 @@ public class ClientFrame {
 
         myClient = new Client(login, password, ipClient, listOfFiles, exist);
 
-        outStream.writeObject(myClient);
-        int controle = inStream.readInt();
-        controleConnection(controle);
+        try 
+        {
+			outStream.writeObject(myClient);
+			int controle = inStream.readInt();
+			controleConnection(controle);
+		} 
+        catch (IOException e) 
+        {
+			//e.printStackTrace();
+		}
     }
 
     /*
@@ -260,7 +334,7 @@ public class ClientFrame {
 			@Override
             public void run() 
             {
-                while (true) 
+                while(true) 
                 {
                     try 
                     {
@@ -294,11 +368,6 @@ public class ClientFrame {
                             if (((ArrayList) o).size() > 0) 
                             {
                             	listOfClients = (ArrayList<Client>) o;
-                            	
-                            	for (Client client : listOfClients) 
-                            	{
-									client.affichefile();
-								}
 
                                 if (jcbobxForClient.getItemCount() >= 1) 
                                 {
@@ -307,15 +376,16 @@ public class ClientFrame {
                                 for (Client thisClient : listOfClients) 
                                 {
                                     jcbobxForClient.addItem(thisClient);
-                                    System.out.println(thisClient.getName());
-                                    System.out.println(thisClient.getListOfFiles());
                                 }
                             }
                         }
                     } 
                     catch (IOException | ClassNotFoundException e) 
                     {
-                        e.printStackTrace();
+                        lblError.setText("Connection to server lost!");
+                        myCardLayout.show(pnlMain, "panelLogin");
+                        outStream = null;
+                        inStream = null;
                     }
                 }
             }
@@ -374,7 +444,6 @@ public class ClientFrame {
                                     break;
                                 }
                             }
-                            System.out.println(monFichier.getAbsolutePath());
                             // envoie du fichier
                             Files.copy(Paths.get(monFichier.getAbsolutePath()), outStreamClienttoClient);
                             clientRequestSocket.close();
@@ -406,7 +475,7 @@ public class ClientFrame {
         switch (value) 
         {
             case 0:
-                lblError.setText("Wrong user or password");
+                lblError.setText("User or Password incorrect!");
                 frame.repaint();
                 frame.revalidate();
                 break;
@@ -417,13 +486,13 @@ public class ClientFrame {
                 break;
 
             case 2:
-                lblError.setText("User already exist");
+                lblError.setText("User already exists!");
                 frame.repaint();
                 frame.validate();
                 break;
 
             default:
-                lblError.setText("Unknown Error please try again");
+                lblError.setText("Unknown error please try again!");
                 frame.repaint();
                 frame.validate();
         }
@@ -476,12 +545,8 @@ public class ClientFrame {
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            try {
-                exist = true;
-                connect();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            exist = true;
+			connect();
         }
     }
 
@@ -490,14 +555,8 @@ public class ClientFrame {
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            try 
-            {
-                exist = false;
-                connect();
-            } catch (IOException e1) 
-            {
-                e1.printStackTrace();
-            }
+            exist = false;
+			connect();
         }
     }
 
@@ -550,34 +609,18 @@ public class ClientFrame {
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            System.out.println("avant remove" + Arrays.toString(listOfFiles));
             model.removeAllElements(); //enl�ve l'affichage des fichiers dans la liste
 
             if (jcbobxForClient.getItemCount() > 0) { //si il y a quelque chose dans la liste
-                System.out.println("hello ma liste est plus grande que 0");
                 //remplissage du panel par rapport aux clients connecter.
                 for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) 
                 {
-                    System.out.println("nom du fichier" + myFile);
                     model.addElement(myFile);
                 }
-                System.out.println(Arrays.toString(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()));
             }
         }
     }
     
-    private class TestReload implements ActionListener 
-    {
-        @Override
-        public void actionPerformed(ActionEvent e) 
-        {
-        	for (int i = 0; i < listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles().length; i++) 
-        	{
-				System.out.println(listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()[i]);
-			}
-        }
-    }
-
     /*
      * ici on crꥠle c??"Client" du dl
      */
@@ -586,8 +629,7 @@ public class ClientFrame {
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            String myFile = model.get(JlstFile.getSelectedIndex());
-            System.out.println(myFile);
+            String myFile = model.get(JlstFile.getSelectedIndex());         
             Client target = listOfClients.get(jcbobxForClient.getSelectedIndex());
             FileRequest fr = new FileRequest(myFile, myClient, target);
 
@@ -600,18 +642,16 @@ public class ClientFrame {
                     try 
                     {
                         requestClient = new Socket(fr.getTarget().getIp(), 45001);
-                        System.out.println(fr.getTarget().getIp());
                         inStreamRequestClient = requestClient.getInputStream();
-                        System.out.println(3);
                         outStreamRequestClient = new ObjectOutputStream(requestClient.getOutputStream());
-                        System.out.println(4);
                         outStreamRequestClient.writeObject(fr);
                         Files.copy(inStreamRequestClient, Paths.get(directoryFiles + fr.getNameFile()));
                     } 
                     catch (IOException e) 
                     {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        lblErrorServer.setText("Please select a file to download!");
+                        frame.repaint();
+                        frame.validate();
                     }
                 }
             }).start();

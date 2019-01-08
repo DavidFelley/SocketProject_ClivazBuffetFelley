@@ -59,7 +59,6 @@ public class AccepteClient extends Thread
 						if (clientRegistered.getMdp().equals(myClient.getMdp()))
 						{
 							log.write("Mot de passe validé, connection validée", "info");
-							System.out.println("Mot de passe correct");
 							validation = 1;
 							//Affiche la confirmation du password dans le server
 							showMessage("System", "Password Validate");
@@ -70,7 +69,6 @@ public class AccepteClient extends Thread
 							//Affiche l'échec du password
 							log.write("Mot de passe incorrecte, connection refusée", "info");
 							showMessage("System", "Wrong password");
-							System.out.println("Mot de passe incorrect");
 							validation = 0;
 							break;
 						}
@@ -136,10 +134,6 @@ public class AccepteClient extends Thread
 						if (o instanceof CloseMyConnection) 
 						{
 							CloseMyConnection cmc = (CloseMyConnection) o;
-							if (myClient.getName().equals(cmc.getClient().getName())) 
-							{
-								System.out.println("je quitte tout");
-							}
 						}
 					}
 				} 
@@ -195,12 +189,12 @@ public class AccepteClient extends Thread
 		
 		for (AccepteClient client : listClientsConnected) 
 		{
-			if(client != this)
-			{
+//			if(client != this)
+//			{
 				client.outStream.reset();
 				client.outStream.writeObject(ClientAddFile);
 				client.outStream.flush();
-			}
+//			}
 		}
 	}
 

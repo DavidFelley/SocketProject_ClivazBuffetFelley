@@ -39,9 +39,7 @@ public class Server
 			//wait for a client connection
 			while (true) 
 			{
-				clientSocket = mySkServer.accept();
-				System.out.println("connection request received");
-				
+				clientSocket = mySkServer.accept();				
 				log.write("Tentative de connection d'un client", "info");
 				Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize, log);
 				
