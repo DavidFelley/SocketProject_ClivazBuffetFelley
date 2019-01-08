@@ -123,6 +123,8 @@ public class AccepteClient extends Thread
 									client = this;
 							}
 							
+							updateClientList();
+							
 							System.out.println("ON EST PASSE PAR LA MAGGLE");
 						}
 						
