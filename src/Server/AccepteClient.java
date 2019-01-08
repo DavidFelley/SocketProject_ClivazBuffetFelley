@@ -173,8 +173,12 @@ public class AccepteClient extends Thread
 		}
 		for (AccepteClient accepteClient : listClientsConnected) 
 		{
-			accepteClient.outStream.writeObject(alClient);
-			accepteClient.outStream.flush();
+			if(accepteClient != this)
+			{
+				accepteClient.outStream.writeObject(alClient);
+				accepteClient.outStream.flush();
+			}
+			
 		}
 	}
 	
@@ -191,9 +195,12 @@ public class AccepteClient extends Thread
 		
 		for (AccepteClient client : listClientsConnected) 
 		{
-			client.outStream.reset();
-			client.outStream.writeObject(ClientAddFile);
-			client.outStream.flush();
+			if(client != this)
+			{
+				client.outStream.reset();
+				client.outStream.writeObject(ClientAddFile);
+				client.outStream.flush();
+			}
 		}
 	}
 

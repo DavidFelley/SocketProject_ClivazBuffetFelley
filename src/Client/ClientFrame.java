@@ -160,7 +160,8 @@ public class ClientFrame {
         JPanel panel = new JPanel();
         pnlSharedFiles.add(panel, BorderLayout.NORTH);
 
-        JLabel lblSharedFiles = new JLabel("My Files");
+        JLabel lblSharedFiles = new JLabel("My shared files");
+        lblSharedFiles.setFont(new Font("Tahoma", Font.BOLD, 13));
         panel.add(lblSharedFiles);
 
         pnlListShared = new JPanel();
@@ -207,12 +208,19 @@ public class ClientFrame {
     }
 
     /* ajout de chaque fichier dans le dossier dans une liste*/
-    private void addFileInList(String[] listOfFiles) 
+    private void initSharedList(String[] listOfFiles) 
     {
-        for (String listOfFile : listOfFiles) {
-            JLabel lblfileName = new JLabel(listOfFile);
-            pnlListShared.add(lblfileName);
+        for (String listOfFile : listOfFiles) 
+        {
+            createLabel(listOfFile);
         }
+        
+    }
+    
+    private void createLabel(String nameLbl)
+    {
+    	JLabel lblfileName = new JLabel(nameLbl);
+        pnlListShared.add(lblfileName);       
         pnlSharedFiles.validate();
         pnlSharedFiles.repaint();
     }
@@ -344,7 +352,6 @@ public class ClientFrame {
                         {
                             e.printStackTrace();
                         }
-                        //a tester si vraim,ent besoin de 2 inputstream diff곥nt
 
                         if (oClient instanceof FileRequest) 
                         {
@@ -404,7 +411,7 @@ public class ClientFrame {
                 frame.revalidate();
                 break;
             case 1:
-                addFileInList(myClient.getListOfFiles());
+                initSharedList(myClient.getListOfFiles());
                 myCardLayout.show(pnlMain, "panelServer");
                 listenServer();
                 break;
@@ -451,6 +458,8 @@ public class ClientFrame {
 
             //copy source to target using Files Class
             Files.copy(sourceDirectory, targetDirectory);
+            
+            createLabel(file.getName());
             
             newListOfFile = getListOfFiles();
             outStream.writeObject(newListOfFile);
