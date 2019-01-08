@@ -35,7 +35,7 @@ public class ClientFrame {
     private Socket requestClient;
     private InputStream inStreamRequestClient;
     private ObjectOutputStream outStreamRequestClient;
-
+    private String[] newListOfFile = null;
     private String directoryFiles = "C:\\SharedDocuments\\";
 
     //Variables graphiques
@@ -58,7 +58,8 @@ public class ClientFrame {
     /**
      * Create the application.
      */
-    public ClientFrame() {
+    public ClientFrame() 
+    {
         initialize();
     }
 
@@ -416,13 +417,15 @@ public class ClientFrame {
     private String[] getListOfFiles() {
         File directory = new File(directoryFiles);
 
-        if (!directory.exists()) {
+        if (!directory.exists()) 
+        {
             directory.mkdir(); //cr�ation du dossier
         }
         String[] files = new String[directory.list().length];
         File[] lst = directory.listFiles();
 
-        for (int i = 0; i < files.length; i++) {
+        for (int i = 0; i < files.length; i++) 
+        {
             files[i] = lst[i].getName();
         }
         return files;
@@ -437,9 +440,11 @@ public class ClientFrame {
 
             //copy source to target using Files Class
             Files.copy(sourceDirectory, targetDirectory);
-            getListOfFiles();
-
-        } catch (Exception e) 
+            
+            newListOfFile = getListOfFiles();
+            outStream.writeObject(newListOfFile);
+        } 
+        catch (Exception e) 
         {
             e.printStackTrace();
         }
