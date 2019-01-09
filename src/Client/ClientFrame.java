@@ -361,7 +361,7 @@ public class ClientFrame
                              * If we are the sender of the Message we show "Me"
                              * 
                              */
-                            if (!m.getClient().getName().equals(myClient.getName())) 
+                            if (m.getClient().getName().equals(myClient.getName())) 
                             {
                                 sender = "Me";
                             } 
@@ -389,7 +389,7 @@ public class ClientFrame
                                 }
                                 for (Client thisClient : listOfClients) 
                                 {
-                                	if (thisClient.getName().equals(myClient.getName())) 
+                                	if(thisClient != myClient)
                                 		jcbobxForClient.addItem(thisClient);
                                 }
                             }

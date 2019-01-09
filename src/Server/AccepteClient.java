@@ -120,7 +120,7 @@ public class AccepteClient extends Thread
 			 */
 			if (validation == 1) 
 			{
-				listClientsConnected.add(this);
+				this.listClientsConnected.add(this);
 				updateClientList();
 				try 
 				{
