@@ -701,6 +701,9 @@ public class ClientFrame
                         outStreamRequestClient = new ObjectOutputStream(requestClient.getOutputStream());
                         outStreamRequestClient.writeObject(fr);
                         Files.copy(inStreamRequestClient, Paths.get(directoryFiles + fr.getNameFile()));
+                        newListOfFile = getListOfFiles();
+                        outStream.writeObject(newListOfFile);
+                        outStream.flush(); 
                     } 
                     catch (IOException e) 
                     {
