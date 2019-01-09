@@ -458,3 +458,19 @@ janv. 09, 2019 12:37:45 AM Server.Logging write
 INFOS: david reconnu
 janv. 09, 2019 12:37:45 AM Server.Logging write
 INFOS: Mot de passe validé, connection validée
+janv. 09, 2019 8:21:51 AM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 09, 2019 8:21:51 AM Server.Logging write
+INFOS: david reconnu
+janv. 09, 2019 8:21:51 AM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 09, 2019 8:22:26 AM Server.Logging write
+AVERTISSEMENT: Connection reset
+janv. 09, 2019 8:31:49 AM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 09, 2019 8:31:49 AM Server.Logging write
+INFOS: david reconnu
+janv. 09, 2019 8:31:49 AM Server.Logging write
+INFOS: Mot de passe validé, connection validée
+janv. 09, 2019 8:32:13 AM Server.Logging write
+AVERTISSEMENT: Connection reset

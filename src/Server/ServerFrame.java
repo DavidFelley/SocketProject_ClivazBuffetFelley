@@ -32,14 +32,15 @@ public class ServerFrame {
         frmServer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel pnlServer = new JPanel();
-        pnlServer.setBackground(Color.GRAY);
+        pnlServer.setBackground(Color.LIGHT_GRAY);
         frmServer.getContentPane().add(pnlServer, BorderLayout.CENTER);
         pnlServer.setLayout(null);
 
         JButton btnPower = new JButton("ShutDown");
+        btnPower.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         btnPower.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        btnPower.setBackground(Color.RED);
-        btnPower.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
+        btnPower.setBackground(Color.LIGHT_GRAY);
+        btnPower.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, Color.BLACK, Color.WHITE, Color.BLACK));
 
         btnPower.addActionListener(new powerOff());
         btnPower.setBounds(512, 587, 128, 57);
@@ -47,13 +48,13 @@ public class ServerFrame {
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(89, 11, 1046, 539);
+        pnlInfoServer.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         scrollPane.setViewportView(pnlInfoServer);
         scrollPane.setVisible(true);
         pnlServer.add(scrollPane);
 
 
-        pnlInfoServer.setBackground(Color.GRAY);
-        pnlInfoServer.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.RED, Color.RED, Color.RED, Color.RED));
+        pnlInfoServer.setBackground(Color.WHITE);
         pnlInfoServer.setBounds(36, 11, 1050, 543);
         pnlInfoServer.setLayout(new BoxLayout(pnlInfoServer, BoxLayout.Y_AXIS));
 
