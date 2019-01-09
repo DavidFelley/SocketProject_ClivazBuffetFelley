@@ -29,7 +29,7 @@ public class Logging
 		getYear = cal.get(cal.YEAR);
 
 		File f = new File("Logger\\logs-" + getMonth +"-"+getYear + ".txt");
-		path = f.getName();
+		path = "Logger/"+f.getName();
 
 		try 
 		{
@@ -49,7 +49,7 @@ public class Logging
 		
 		try 
 		{
-			fh = new FileHandler("./"+path,true);
+			fh = new FileHandler(path,true);
 		} 
 		catch (SecurityException | IOException e) 
 		{
