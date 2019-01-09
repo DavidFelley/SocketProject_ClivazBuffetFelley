@@ -42,8 +42,6 @@ public class ClientFrame
     private JTextField jtxtfLogin;
     private JTextField jtxtfServer;
     private JPasswordField jtxtfPassword;
-    private JPanel pnlSharedFiles;
-    private JPanel pnlListShared;
     private CardLayout myCardLayout = new CardLayout();
     private JPanel pnlMain = new JPanel(myCardLayout);
     private JPanel pnlServer;
@@ -67,7 +65,7 @@ public class ClientFrame
     {
         frame = new JFrame();
         frame.setResizable(false);
-        frame.setBounds(100, 100, 1000, 650);
+        frame.setBounds(100, 100, 770, 586);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -82,7 +80,7 @@ public class ClientFrame
         jtxtfLogin.setSelectedTextColor(Color.WHITE);
         jtxtfLogin.setSelectionColor(Color.BLUE);
         jtxtfLogin.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
-        jtxtfLogin.setBounds(332, 78, 330, 22);
+        jtxtfLogin.setBounds(217, 78, 330, 22);
         panelLogin.add(jtxtfLogin);
         jtxtfLogin.setColumns(10);
 
@@ -90,7 +88,7 @@ public class ClientFrame
         jtxtfServer.setSelectedTextColor(Color.WHITE);
         jtxtfServer.setSelectionColor(Color.BLUE);
         jtxtfServer.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
-        jtxtfServer.setBounds(332, 396, 330, 22);
+        jtxtfServer.setBounds(217, 283, 330, 22);
         panelLogin.add(jtxtfServer);
         jtxtfServer.setColumns(10);
 
@@ -98,26 +96,26 @@ public class ClientFrame
         jtxtfPassword.setSelectedTextColor(Color.WHITE);
         jtxtfPassword.setSelectionColor(Color.BLUE);
         jtxtfPassword.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
-        jtxtfPassword.setBounds(332, 237, 330, 22);
+        jtxtfPassword.setBounds(217, 183, 330, 22);
         panelLogin.add(jtxtfPassword);
 
         JLabel lblLogin = new JLabel("Login");
         lblLogin.setBackground(Color.GRAY);
         lblLogin.setForeground(Color.BLACK);
         lblLogin.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 20));
-        lblLogin.setBounds(332, 43, 191, 34);
+        lblLogin.setBounds(217, 43, 191, 34);
         panelLogin.add(lblLogin);
 
         JLabel lblPassword = new JLabel("Password");
         lblPassword.setForeground(Color.BLACK);
         lblPassword.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 20));
-        lblPassword.setBounds(332, 208, 191, 16);
+        lblPassword.setBounds(217, 154, 191, 16);
         panelLogin.add(lblPassword);
 
         JLabel lblServerIp = new JLabel("Server IP");
         lblServerIp.setForeground(Color.BLACK);
         lblServerIp.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 20));
-        lblServerIp.setBounds(332, 367, 191, 16);
+        lblServerIp.setBounds(217, 254, 191, 16);
         panelLogin.add(lblServerIp);
 
         JButton btnLogin = new JButton("Login");
@@ -125,7 +123,7 @@ public class ClientFrame
         btnLogin.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 15));
         btnLogin.setForeground(Color.BLACK);
         btnLogin.setBackground(Color.LIGHT_GRAY);
-        btnLogin.setBounds(266, 528, 97, 25);
+        btnLogin.setBounds(217, 400, 97, 25);
         btnLogin.addActionListener(new LoginClick());
         panelLogin.add(btnLogin);
 
@@ -134,14 +132,14 @@ public class ClientFrame
         btnSignIn.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         btnSignIn.setBackground(Color.LIGHT_GRAY);
         btnSignIn.setForeground(Color.BLACK);
-        btnSignIn.setBounds(629, 528, 97, 25);
+        btnSignIn.setBounds(450, 400, 97, 25);
         btnSignIn.addActionListener(new SignInClick());
         panelLogin.add(btnSignIn);
 
         lblError = new JLabel("", SwingConstants.CENTER);
         lblError.setFont(new Font("Arial", Font.PLAIN, 13));
         lblError.setForeground(Color.BLACK);
-        lblError.setBounds(236, 458, 522, 22);
+        lblError.setBounds(121, 350, 522, 22);
         panelLogin.add(lblError);
 
         pnlServer = new JPanel();
@@ -168,34 +166,13 @@ public class ClientFrame
         JlstFile.setSelectionForeground(Color.WHITE);
         panelFiles.add(JlstFile, BorderLayout.CENTER);
 
-        pnlSharedFiles = new JPanel();
-        pnlSharedFiles.setBounds(731, 13, 251, 420);
-        pnlServer.add(pnlSharedFiles);
-        pnlSharedFiles.setLayout(new BorderLayout(10, 0));
-
-        JPanel panel = new JPanel();
-        panel.setFont(new Font("MS Reference Sans Serif", Font.BOLD, 13));
-        panel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-        panel.setForeground(new Color(0, 0, 0));
-        panel.setBackground(Color.WHITE);
-        pnlSharedFiles.add(panel, BorderLayout.NORTH);
-
-        JLabel lblSharedFiles = new JLabel("My shared files");
-        lblSharedFiles.setFont(new Font("MS Reference Sans Serif", Font.BOLD, 13));
-        panel.add(lblSharedFiles);
-
-        pnlListShared = new JPanel();
-        pnlListShared.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
-        pnlListShared.setBackground(Color.WHITE);
-        pnlSharedFiles.add(pnlListShared, BorderLayout.CENTER);
-
         JButton btnAddFile = new JButton("Add File");
         btnAddFile.setBorder(new BevelBorder(BevelBorder.LOWERED, Color.BLACK, Color.BLACK, Color.WHITE, Color.BLACK));
         btnAddFile.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
         btnAddFile.setBackground(Color.LIGHT_GRAY);
         btnAddFile.setForeground(Color.BLACK);
         btnAddFile.addActionListener(new addFile());
-        btnAddFile.setBounds(731, 448, 97, 25);
+        btnAddFile.setBounds(166, 448, 97, 25);
         pnlServer.add(btnAddFile);
 
         JButton btnDownload = new JButton("Download");
@@ -240,7 +217,7 @@ public class ClientFrame
         lblErrorServer = new JLabel("", SwingConstants.CENTER);
         lblErrorServer.setForeground(Color.BLACK);
         lblErrorServer.setFont(new Font("MS Reference Sans Serif", Font.PLAIN, 13));
-        lblErrorServer.setBounds(236, 523, 522, 22);
+        lblErrorServer.setBounds(121, 499, 522, 22);
         pnlServer.add(lblErrorServer);
 
         //Afin de faire des tests plsu rapidement nous mettons des donn�e en dur (mettre en commentaire par la suiste)
@@ -253,35 +230,7 @@ public class ClientFrame
 
         frame.setVisible(true);
     }
-
-
-    /***
-     * Method of initialization of the list of shared files from the Client
-     * 
-     * @param listOfFiles
-     */
-    private void initSharedList(String[] listOfFiles) 
-    {
-        for (String listOfFile : listOfFiles) 
-        {
-            createLabel(listOfFile);
-        }
-        
-    }
     
-    /**
-     * Method of creation all labels in the list of shared files
-     * 
-     * @param nameLbl
-     */
-    private void createLabel(String nameLbl)
-    {
-    	JLabel lblfileName = new JLabel(nameLbl);
-        pnlListShared.add(lblfileName);       
-        pnlSharedFiles.validate();
-        pnlSharedFiles.repaint();
-    }
-
     /**
      * Method that launch the connection to the server
      */
@@ -501,7 +450,6 @@ public class ClientFrame
                 frame.revalidate();
                 break;
             case 1:
-                initSharedList(myClient.getListOfFiles());
                 myCardLayout.show(pnlMain, "panelServer");
                 listenServer();
                 break;
@@ -557,9 +505,7 @@ public class ClientFrame
             Path targetDirectory = Paths.get(directoryFiles + file.getName());
 
             Files.copy(sourceDirectory, targetDirectory);
-            
-            createLabel(file.getName());
-            
+                        
             newListOfFile = getListOfFiles();
             outStream.writeObject(newListOfFile);
             outStream.flush();            
@@ -618,7 +564,6 @@ public class ClientFrame
             if (resultat == JFileChooser.APPROVE_OPTION) 
             {
                 saveToDirectory(myJfileChooser.getSelectedFile().getAbsolutePath());
-                pnlSharedFiles.add(pnlListShared, BorderLayout.CENTER);
             }
         }
     }
