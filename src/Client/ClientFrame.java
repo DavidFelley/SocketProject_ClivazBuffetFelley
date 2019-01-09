@@ -334,7 +334,7 @@ public class ClientFrame
      * Listen to new File shared
      * 
      */
-    private void listenServer() 
+    private void listenServer()
     {
         new Thread(new Runnable() 
         {
@@ -389,7 +389,6 @@ public class ClientFrame
                                 }
                                 for (Client thisClient : listOfClients) 
                                 {
-                                	if(!thisClient.getName().equals(myClient.getName()))
                                 		jcbobxForClient.addItem(thisClient);
                                 }
                             }
@@ -670,7 +669,6 @@ public class ClientFrame
                 //remplissage du panel par rapport aux clients connecter.
                 for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) 
                 {
-                	if(!listOfClients.get(jcbobxForClient.getSelectedIndex()).getName().equals(myClient.getName()))
                 		model.addElement(myFile);
                 }
             }
