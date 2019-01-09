@@ -670,7 +670,8 @@ public class ClientFrame
                 //remplissage du panel par rapport aux clients connecter.
                 for (String myFile : listOfClients.get(jcbobxForClient.getSelectedIndex()).getListOfFiles()) 
                 {
-                    model.addElement(myFile);
+                	if(!listOfClients.get(jcbobxForClient.getSelectedIndex()).getName().equals(myClient.getName()))
+                		model.addElement(myFile);
                 }
             }
         }
