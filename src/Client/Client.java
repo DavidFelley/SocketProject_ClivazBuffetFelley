@@ -4,15 +4,21 @@ import java.io.Serializable;
 
 public class Client implements Serializable 
 {
-	/*
-	 * Création de l'objet client 
-	 */
 	private String name;
 	private String mdp;
 	private String ip;
 	private String [] listOfFiles;
 	private boolean exist;
 	
+	/**
+	 * Full client constructor
+	 * 
+	 * @param name
+	 * @param mdp
+	 * @param ip
+	 * @param listOffiles
+	 * @param exist
+	 */
 	public Client(String name, String mdp, String ip, String [] listOffiles, boolean exist) 
 	{
 		this.name = name;
@@ -22,6 +28,12 @@ public class Client implements Serializable
 		this.exist = exist;
 	}
 	
+	/**
+	 * Client constructor for connection
+	 * 
+	 * @param name
+	 * @param mdp
+	 */	
 	public Client(String name, String mdp) 
 	{
 		this.name = name;

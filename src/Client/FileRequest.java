@@ -8,6 +8,13 @@ public class FileRequest implements Serializable
     private final Client sender;
     private final Client target;
 
+    /**
+     * FileRequest constructor
+     * 
+     * @param nameFile
+     * @param sender
+     * @param target
+     */
     public FileRequest(String nameFile, Client sender, Client target) 
     {
         this.nameFile = nameFile;

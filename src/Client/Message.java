@@ -8,6 +8,14 @@ public class Message implements Serializable
     private final String message;
     private final LocalDate date;
     private final Client myclient;
+    
+    
+    /**
+     * Message constructor
+     * 
+     * @param message
+     * @param myclient
+     */
     public Message(String message, Client myclient) 
     {
         this.message = message;

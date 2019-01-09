@@ -21,9 +21,7 @@ import javax.swing.border.BevelBorder;
 
 public class ClientFrame 
 {
-	
-    //Variables of connection
-    private Client myClient = null;
+	private Client myClient = null;
     private String[] listOfFiles = null;
     private boolean exist;
     private Socket clientRequestSocket = null;
@@ -40,7 +38,6 @@ public class ClientFrame
     private String[] newListOfFile = null;
     private String directoryFiles = "C:\\SharedDocuments\\";
 
-    //Variables graphiques
     private JFrame frame;
     private JTextField jtxtfLogin;
     private JTextField jtxtfServer;
@@ -58,9 +55,6 @@ public class ClientFrame
     private JList<String> JlstFile;
     private JLabel lblErrorServer;
 
-    /**
-     * Create the application.
-     */
     public ClientFrame() 
     {
         initialize();
@@ -69,7 +63,8 @@ public class ClientFrame
     /**
      * Initialize the contents of the frame.
      */
-    private void initialize() {
+    private void initialize() 
+    {
         frame = new JFrame();
         frame.setResizable(false);
         frame.setBounds(100, 100, 1000, 650);
@@ -259,7 +254,12 @@ public class ClientFrame
         frame.setVisible(true);
     }
 
-    /* ajout de chaque fichier dans le dossier dans une liste*/
+
+    /***
+     * Method of initialization of the list of shared files from the Client
+     * 
+     * @param listOfFiles
+     */
     private void initSharedList(String[] listOfFiles) 
     {
         for (String listOfFile : listOfFiles) 
@@ -269,6 +269,11 @@ public class ClientFrame
         
     }
     
+    /**
+     * Method of creation all labels in the list of shared files
+     * 
+     * @param nameLbl
+     */
     private void createLabel(String nameLbl)
     {
     	JLabel lblfileName = new JLabel(nameLbl);
@@ -277,7 +282,8 @@ public class ClientFrame
         pnlSharedFiles.repaint();
     }
 
-    /* Connection du client vers le server suivant les infos donnï¿½e
+    /**
+     * Method that launch the connection to the server
      */
     private void connect()
     {
@@ -320,9 +326,13 @@ public class ClientFrame
 		}
     }
 
-    /*
-     * mise a jour de l'interface graphique du client par rapport au changement
-     * nouveau message , nouveau liste de fichiers , nouveau client connectï¿½ , ...
+    /**
+     * Method that listen continuously to the server and change the frame
+     * 
+     * Listen to Client connection
+     * Listen to new Message
+     * Listen to new File shared
+     * 
      */
     private void listenServer() 
     {
@@ -337,16 +347,22 @@ public class ClientFrame
                     try 
                     {
                         Object o = inStream.readObject();
-                        /*
-                         * si l'objet mis a jour est un message
-                         * alors on met a jout le texte area
+                        
+                        
+                        /**
+                         * If the object received is a message
+                         * 
                          */
                         if (o instanceof Message) 
                         {
                             Message m = (Message) o;
                             String sender;
-                            //lors de l'envoie du message , si c'est nous qui envoyont le message nous voyons "Me" a la place de notre pseudo
-                            if (m.getClient().getName().equals(myClient.getName())) {
+                            /**
+                             * If we are the sender of the Message we show "Me"
+                             * 
+                             */
+                            if (m.getClient().getName().equals(myClient.getName())) 
+                            {
                                 sender = "Me";
                             } 
                             else 
@@ -356,11 +372,11 @@ public class ClientFrame
                             showNewMessage(sender, m.getMessage());
                         }
 
-                        /*
-                         * si l'objet mis a jour est un ArrayList
-                         *liste des fichiers client (Loan)
+                      
+                        /**
+                         * If the object received is an ArrayList
+                         * 
                          */
-
                         if (o instanceof ArrayList) 
                         {
                             if (((ArrayList) o).size() > 0) 
@@ -389,13 +405,15 @@ public class ClientFrame
             }
         }).start();
 
-        new Thread(new Runnable() //Thread d'échange fichier  , partie h??(le client qui possède le fichier)
-        {
-            //donc ici je suis le client qui possède le fichier
+        /**
+         * Thread listening to Client trying to reach a File
+         * 
+         */
+        new Thread(new Runnable() 
+        {         
             @Override
             public void run() 
             {
-                //crée´ion d'un socketsrv
                 try 
                 {
                     myHostClient = new ServerSocket(45001, 10, InetAddress.getByName(myClient.getIp()));
@@ -403,17 +421,15 @@ public class ClientFrame
                     Object oClient = null;
                     while (true) 
                     {
-                        /*
-                         *  Crê¢´ion du server pour l'hote du fichier
-                         */
-                    	
+                       /**
+                        * Creation of the socket between the two Client
+                        * 
+                        */
                         clientRequestSocket = myHostClient.accept();
                         inStreamClienttoClient = new ObjectInputStream(clientRequestSocket.getInputStream());
                         outStreamClienttoClient = clientRequestSocket.getOutputStream();
-
                         try 
                         {
-                            // J'ê¤¯ute si quelqu'un veut un fichier
                             oClient = inStreamClienttoClient.readObject();
                         } 
                         catch (ClassNotFoundException | IOException e) 
@@ -421,19 +437,19 @@ public class ClientFrame
                             e.printStackTrace();
                         }
 
+                        /**
+                         * If the object received is a FileRequest
+                         * 
+                         */
                         if (oClient instanceof FileRequest) 
                         {
                             FileRequest frClient = (FileRequest) oClient;
-                            //Cherche le fichier correspondant
-                            //on part du principe que le dossier d'envoie et le më®¥ que celui de reception
                             File dlDirectory = new File(directoryFiles);
-                            if (!dlDirectory.exists() || !frClient.getTarget().getIp().equals(myClient.getIp())) // + verification du fichier dans le dossier
+                            if (!dlDirectory.exists() || !frClient.getTarget().getIp().equals(myClient.getIp()))
                             {
-                                return; //pas besoin de continuer
-                            }
-                            //rê¤µpê³¡tion du fichier convoité¡°ar le client "clientRequest"
+                                return; 
+                            }                         
                             File monFichier = null;
-                            //prise du fichier dans le client qui correspond
                             for (File f : dlDirectory.listFiles()) 
                             {
                                 if (f.getName().equals(frClient.getNameFile())) 
@@ -441,8 +457,7 @@ public class ClientFrame
                                     monFichier = f;
                                     break;
                                 }
-                            }
-                            // envoie du fichier
+                            }                           
                             Files.copy(Paths.get(monFichier.getAbsolutePath()), outStreamClienttoClient);
                             clientRequestSocket.close();
                         }
@@ -456,17 +471,26 @@ public class ClientFrame
         }).start();
     }
 
+    /**
+     * Method showing the Message received with Time
+     * 
+     * @param sender
+     * @param message
+     */
     private void showNewMessage(String sender, String message) 
     {
         DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("HH:mm");
-
-        //Get formatted String
         String dateFormated = formatDate.format(LocalDateTime.now());
-
 
         txtAreaChat.append("[" + dateFormated  + "] " + sender + " : " + message + "\n");
     }
 
+    /**
+     * Method listening to server answer after the connection request
+     * 
+     * @param value
+     */
+    
     private void controleConnection(int value) 
     {
         switch (value) 
@@ -495,7 +519,11 @@ public class ClientFrame
         }
     }
 
-    //crï¿½ation de la listes des fichiers
+    /**
+     * Method of creation of the Client.ListOfFiles
+     * 
+     * @return files
+     */
     private String[] getListOfFiles() {
         File directory = new File(directoryFiles);
 
@@ -515,14 +543,19 @@ public class ClientFrame
         return files;
     }
 
-    private void saveToDirectory(String path) {
+    /**
+     * Method of copy of a File in the SharedDocument directory
+     * 
+     * @param path
+     */
+    private void saveToDirectory(String path) 
+    {
         try 
         {
             File file = new File(path);
             Path sourceDirectory = Paths.get(path);
             Path targetDirectory = Paths.get(directoryFiles + file.getName());
 
-            //copy source to target using Files Class
             Files.copy(sourceDirectory, targetDirectory);
             
             createLabel(file.getName());
@@ -537,6 +570,10 @@ public class ClientFrame
         }
     }
 
+    /**
+     * ActionListener for the connection button
+     * 
+     */
     class LoginClick implements ActionListener 
     {
         @Override
@@ -547,6 +584,10 @@ public class ClientFrame
         }
     }
 
+    /**
+     * ActionListener for the sign in button 
+     *
+     */
     class SignInClick implements ActionListener 
     {
         @Override
@@ -557,6 +598,10 @@ public class ClientFrame
         }
     }
 
+    /**
+     * ActionListener for the add file button
+     *
+     */
     class addFile implements ActionListener 
     {
         @Override
@@ -578,6 +623,10 @@ public class ClientFrame
         }
     }
 
+    /** 
+     * ActionListener for the send message button
+     *
+     */
     private class sendMessage implements ActionListener 
     {
         @Override
@@ -587,6 +636,10 @@ public class ClientFrame
         }
     }
 
+    /**
+     * Method for sending a Message to the server
+     * 
+     */
 	private void sendMessage() 
 	{
 		try 
@@ -601,6 +654,10 @@ public class ClientFrame
         }
 	}
 	
+	/**
+	 * ActionListener for the list of shared file from other Clients 
+	 *
+	 */
     private class SelectionChanged implements ActionListener 
     {
         @Override
@@ -618,8 +675,9 @@ public class ClientFrame
         }
     }
     
-    /*
-     * ici on crê¥ le c??"Client" du dl
+    /**
+     * ActionListener for the dowload button
+     *
      */
     private class DownloadButtonClick implements ActionListener 
     {
@@ -655,6 +713,10 @@ public class ClientFrame
         }
     }
     
+    /**
+     *KeyListener for the enter key
+     *
+     */
     private class KeySender extends KeyAdapter 
     {
     	public void keyPressed(KeyEvent e) 
