@@ -389,7 +389,7 @@ public class ClientFrame
                                 }
                                 for (Client thisClient : listOfClients) 
                                 {
-                                	if (thisClient != myClient) 
+                                	if (thisClient.getName().equals(myClient.getName())) 
                                 		jcbobxForClient.addItem(thisClient);
                                 }
                             }
