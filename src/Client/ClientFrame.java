@@ -389,7 +389,8 @@ public class ClientFrame
                                 }
                                 for (Client thisClient : listOfClients) 
                                 {
-                                    jcbobxForClient.addItem(thisClient);
+                                	if (thisClient != myClient) 
+                                	jcbobxForClient.addItem(thisClient);
                                 }
                             }
                         }
