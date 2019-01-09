@@ -23,7 +23,16 @@ public class AccepteClient extends Thread
 	private ObjectOutputStream outStream = null;
 	private int validation = 0;
 
-	//Constructor
+	/**
+	 * AcceptClient constructor
+	 * 
+	 * 
+	 * @param clientSocketOnServer
+	 * @param clientsConnected
+	 * @param sf
+	 * @param serialize
+	 * @param log
+	 */
 	public AccepteClient(Socket clientSocketOnServer, ArrayList<AccepteClient> clientsConnected, ServerFrame sf, Serialize serialize, Logging log) 
 	{
 		this.clientSocketOnServer = clientSocketOnServer;
@@ -33,7 +42,6 @@ public class AccepteClient extends Thread
 		this.log = log;
 	}
 
-	//overwrite the thread run()
 	@SuppressWarnings({"unchecked", "deprecation"})
 	public void run() 
 	{
@@ -49,7 +57,10 @@ public class AccepteClient extends Thread
 
 			if (myClient.isExist()) 
 			{
-				//Controle si le client existe deja
+				/**
+				 * Controle of a Client connection
+				 * 
+				 */
 				for (Client clientRegistered : listOfClient)
 				{
 					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
@@ -77,7 +88,10 @@ public class AccepteClient extends Thread
 			} 
 			else 
 			{
-				//Controle si le client existe deja
+				/**
+				 * Controle of a Client registration
+				 * 
+				 */
 				for (Client clientRegistered : listOfClient) 
 				{
 					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName())) 
@@ -100,7 +114,10 @@ public class AccepteClient extends Thread
 			outStream.writeInt(validation);
 			outStream.flush();
 
-			//Si le client est validé
+			/**
+			 * Validation of connection
+			 * 
+			 */
 			if (validation == 1) 
 			{
 				listClientsConnected.add(this);
@@ -110,6 +127,10 @@ public class AccepteClient extends Thread
 					Object o;
 					while ((o = inStream.readObject()) != null) 
 					{					
+						/**
+						 * If the Server receive a String[] (When a user add a new File)
+						 * 
+						 */
 						if(o instanceof String [])
 						{
 							String[] newList = (String[]) o;		
@@ -118,7 +139,10 @@ public class AccepteClient extends Thread
 							updateFileClient();
 						}
 						
-						//si un client nous envoie un message nous l'affichons
+						/**
+						 * If the Server receive a Message
+						 * 
+						 */
 						if (o instanceof Message) 
 						{
 							Message m = (Message) o;
@@ -158,6 +182,11 @@ public class AccepteClient extends Thread
 		} 
 	}
 
+	/**
+	 * Method that update the ClientList at each new connection
+	 * 
+	 * @throws IOException
+	 */
 	private void updateClientList() throws IOException 
 	{
 		ArrayList<Client> alClient = new ArrayList<Client>();
@@ -176,6 +205,11 @@ public class AccepteClient extends Thread
 		}
 	}
 	
+	/**
+	 * Method that update the File[] of a Client
+	 * 
+	 * @throws IOException
+	 */
 	private void updateFileClient() throws IOException 
 	{
 		ArrayList<Client> ClientAddFile = new ArrayList<Client>();
@@ -198,6 +232,12 @@ public class AccepteClient extends Thread
 		}
 	}
 
+	/**
+	 * Method that send a received Message to all Client connected
+	 * 
+	 * @param sender
+	 * @param msg
+	 */
 	private void showMessage(String sender, String msg) 
 	{
 		DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy 'at' HH:mm");

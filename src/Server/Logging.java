@@ -18,6 +18,10 @@ public class Logging
 	private Calendar cal = Calendar.getInstance();
 	private FileHandler fh;
 
+	
+	/**
+	 * Logger constructor
+	 */
 	public void createLogger() 
 	{
 		myLogger = Logger.getLogger("Logger");
