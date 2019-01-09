@@ -18,16 +18,19 @@ public class Server
 		launch();
 	}
 
+	/**
+	 * Method launching the server
+	 * 
+	 */
 	@SuppressWarnings("unchecked")
 	private void launch() 
 	{
-		//Initialise la frame
+		/**
+		 * Initialization of the Frame, Logger File and Serialization File
+		 * 
+		 */
 		sf = new ServerFrame();
-
-		//Initialise le fichier de logs
 		log.createLogger();
-
-		//cree les fichiers de sauvegarde utilisateurs si n'existent pas
 		serialize.createFile();
 
 		ServerSocket mySkServer;
@@ -36,14 +39,15 @@ public class Server
 		{
 			mySkServer = new ServerSocket(45000, 5);
 
-			//wait for a client connection
+			/**
+			 * Waiting for a Client connection
+			 * 
+			 */
 			while (true) 
 			{
 				clientSocket = mySkServer.accept();				
 				log.write("Tentative de connection d'un client", "info");
 				Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize, log);
-				
-				//starting the thread
 				t.start();
 			}
 		} 

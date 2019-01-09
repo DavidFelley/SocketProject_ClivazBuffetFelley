@@ -14,6 +14,7 @@ public class ServerFrame {
 
     /**
      * Create the application.
+     * 
      */
     public ServerFrame() 
     {
@@ -22,6 +23,7 @@ public class ServerFrame {
 
     /**
      * Initialize the contents of the frame.
+     * 
      */
     private void initialize() 
     {
@@ -62,7 +64,13 @@ public class ServerFrame {
         frmServer.setVisible(true);
     }
 
-    public static void createLabel(String message) {
+    /**
+     * Method that write the informations in the Server Frame
+     * 
+     * @param message
+     */
+    public static void createLabel(String message) 
+    {
         JLabel lbl = new JLabel(message);
 
         pnlInfoServer.add(lbl);
@@ -70,9 +78,15 @@ public class ServerFrame {
         pnlInfoServer.repaint();
     }
 
-    class powerOff implements ActionListener {
+    /**
+     * ActionListener for the Shutdown button
+     * 
+     */
+    class powerOff implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent arg0) {
+        public void actionPerformed(ActionEvent arg0) 
+        {
             System.exit(0);
         }
     }
