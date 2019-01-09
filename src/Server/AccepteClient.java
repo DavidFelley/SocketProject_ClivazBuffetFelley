@@ -54,10 +54,10 @@ public class AccepteClient extends Thread
 				{
 					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
 					{
-						log.write(myClient.getName()+" reconnu", "info");
+						log.write(myClient.getName()+" find", "info");
 						if (clientRegistered.getMdp().equals(myClient.getMdp()))
 						{
-							log.write("Mot de passe validé, connection validée", "info");
+							log.write("Password validate, access granted", "info");
 							validation = 1;
 							//Affiche la confirmation du password dans le server
 							showMessage("System", "Password Validate");
@@ -66,7 +66,7 @@ public class AccepteClient extends Thread
 						else 
 						{
 							//Affiche l'échec du password
-							log.write("Mot de passe incorrecte, connection refusée", "info");
+							log.write("Wrong password, connection refused", "info");
 							showMessage("System", "Wrong password");
 							validation = 0;
 							break;
@@ -82,7 +82,7 @@ public class AccepteClient extends Thread
 				{
 					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName())) 
 					{
-						log.write(myClient.getName()+" existe déjà, connection refusée", "info");
+						log.write(myClient.getName()+" already exists, connection refused", "info");
 						validation = 2;
 						break;
 					}
@@ -90,7 +90,7 @@ public class AccepteClient extends Thread
 				if (validation != 2) 
 				{
 					Client newClient = new Client(myClient.getName(), myClient.getMdp());
-					log.write(myClient.getName()+" créé, connection validée", "info");
+					log.write("new user "+myClient.getName()+" created, connection granted", "info");
 					listOfClient.add(newClient);
 					serialize.serializeObject(listOfClient);
 					validation = 1;
@@ -114,6 +114,7 @@ public class AccepteClient extends Thread
 						{
 							String[] newList = (String[]) o;		
 							myClient.setListOfFiles(newList);
+							log.write("New shared file from "+myClient.getName(), "info");
 							updateFileClient();
 						}
 						
@@ -146,7 +147,7 @@ public class AccepteClient extends Thread
 			else 
 			{
 				clientSocketOnServer.close();
-				log.write("Connection fermée", "info");
+				log.write("Connection closed", "info");
 				sleep(3000);
 				this.stop();
 			}
