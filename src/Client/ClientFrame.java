@@ -684,8 +684,16 @@ public class ClientFrame
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            String myFile = model.get(JlstFile.getSelectedIndex());         
-            Client target = listOfClients.get(jcbobxForClient.getSelectedIndex());
+        	if(JlstFile.getSelectedIndex()< 0)
+        	{
+        		lblErrorServer.setText("Please select a file to download!");
+                frame.repaint();
+                frame.validate();
+                return;
+        	}
+               
+        	String myFile = model.get(JlstFile.getSelectedIndex());
+        	Client target = listOfClients.get(jcbobxForClient.getSelectedIndex());
             FileRequest fr = new FileRequest(myFile, myClient, target);
 
             new Thread(new Runnable() 
