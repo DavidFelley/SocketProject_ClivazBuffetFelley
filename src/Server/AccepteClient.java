@@ -138,7 +138,7 @@ public class AccepteClient extends Thread
 							log.write("New shared file from "+myClient.getName(), "info");
 							updateFileClient();
 						}
-						
+
 						/**
 						 * If the Server receive a Message
 						 * 
@@ -196,15 +196,11 @@ public class AccepteClient extends Thread
 		}
 		for (AccepteClient accepteClient : listClientsConnected) 
 		{
-			if(accepteClient != this)
-			{
-				accepteClient.outStream.writeObject(alClient);
-				accepteClient.outStream.flush();
-			}
-			
+			accepteClient.outStream.writeObject(alClient);
+			accepteClient.outStream.flush();
 		}
 	}
-	
+
 	/**
 	 * Method that update the File[] of a Client
 	 * 
@@ -220,15 +216,12 @@ public class AccepteClient extends Thread
 			else
 				ClientAddFile.add(myClient);
 		}
-		
+
 		for (AccepteClient client : listClientsConnected) 
 		{
-			if(client != this)
-			{
-				client.outStream.reset();
-				client.outStream.writeObject(ClientAddFile);
-				client.outStream.flush();
-			}
+			client.outStream.reset();
+			client.outStream.writeObject(ClientAddFile);
+			client.outStream.flush();
 		}
 	}
 
