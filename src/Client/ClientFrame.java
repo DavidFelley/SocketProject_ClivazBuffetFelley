@@ -17,8 +17,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import javax.swing.border.BevelBorder;
 
 public class ClientFrame 
@@ -452,7 +450,6 @@ public class ClientFrame
                 } 
                 catch (IOException e1) 
                 {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             }

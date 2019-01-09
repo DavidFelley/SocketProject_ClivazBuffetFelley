@@ -44,19 +44,22 @@ public class Serialize {
     public void createFile() {
         File f = new File("Client\\client.zer");
 
-        try {
+        try 
+        {
             if (!f.getParentFile().exists())
                 f.getParentFile().mkdir();
 
-            if (!f.exists()) {
+            if (!f.exists()) 
+            {
                 f.createNewFile();
                 list.add(admin);
                 serializeObject(list);
             }
 
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
     }
