@@ -12,12 +12,11 @@ public class Server
 	private Serialize serialize = new Serialize();
 	private ArrayList<AccepteClient> listClientsConnected = new ArrayList<>();
 	private Logging log = new Logging();
-
 	public Server() 
 	{
 		launch();
 	}
-
+	
 	/**
 	 * Method launching the server
 	 * 
@@ -48,7 +47,7 @@ public class Server
 				clientSocket = mySkServer.accept();				
 				log.write("Tentative de connection d'un client", "info");
 				Thread t = new AccepteClient(clientSocket, listClientsConnected, sf, serialize, log);
-				t.start();
+				t.start(); //la methode start appel run dans l'instance t (AcceptClient)
 			}
 		} 
 		catch (IOException e) 

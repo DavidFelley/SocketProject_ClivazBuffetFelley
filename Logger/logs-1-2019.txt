@@ -1,0 +1,8 @@
+janv. 10, 2019 9:28:06 AM Server.Logging write
+INFOS: Tentative de connection d'un client
+janv. 10, 2019 9:28:06 AM Server.Logging write
+INFOS: david find
+janv. 10, 2019 9:28:06 AM Server.Logging write
+INFOS: Password validate, access granted
+janv. 10, 2019 9:28:19 AM Server.Logging write
+AVERTISSEMENT: Connection reset

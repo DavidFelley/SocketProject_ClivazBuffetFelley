@@ -1,3 +1,7 @@
+/**
+ * Obsolet Class.
+ */
+
 package Client;
 
 public class CloseMyConnection 

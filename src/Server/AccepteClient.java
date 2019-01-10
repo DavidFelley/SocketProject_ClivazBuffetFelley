@@ -47,13 +47,13 @@ public class AccepteClient extends Thread
 	{
 		try 
 		{
-			outStream = new ObjectOutputStream(clientSocketOnServer.getOutputStream());
+			outStream = new ObjectOutputStream(clientSocketOnServer.getOutputStream()); //permet d'envoyer l'objet au client
+			
+			ObjectInputStream inStream = new ObjectInputStream(clientSocketOnServer.getInputStream()); // ce qui permet de recevoir l'objet du client
 
-			ObjectInputStream inStream = new ObjectInputStream(clientSocketOnServer.getInputStream());
+			myClient = (Client) inStream.readObject(); //j'attend de lire le premier objet qui sera un client. (le client m'envoie ces infos)
 
-			myClient = (Client) inStream.readObject();
-
-			ArrayList<Client> listOfClient = (ArrayList<Client>) (serialize.deSerializeObject());
+			ArrayList<Client> listOfClient = (ArrayList<Client>) (serialize.deSerializeObject()); //récupère la liste de TOUTE les clients qui se sont connecté (enregistré)
 
 			if (myClient.isExist()) 
 			{
@@ -61,9 +61,9 @@ public class AccepteClient extends Thread
 				 * Controle of a Client connection
 				 * 
 				 */
-				for (Client clientRegistered : listOfClient)
+				for (Client clientRegistered : listOfClient) //on parcour jusqu'a la finla list des client enregitrés
 				{
-					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName()))
+					if (clientRegistered.getName().equalsIgnoreCase(myClient.getName())) //si le client actuelle est dans la liste des client enregitré
 					{
 						log.write(myClient.getName()+" find", "info");
 						if (clientRegistered.getMdp().equals(myClient.getMdp()))
@@ -118,14 +118,14 @@ public class AccepteClient extends Thread
 			 * Validation of connection
 			 * 
 			 */
-			if (validation == 1) 
+			if (validation == 1) //Si login mdp est juste 
 			{
-				this.listClientsConnected.add(this);
-				updateClientList();
+				this.listClientsConnected.add(this); //j'ajoute a ma liste Global "listClientsConnected" mon acceptClient
+				updateClientList(); 
 				try 
 				{
-					Object o;
-					while ((o = inStream.readObject()) != null) 
+					Object o; //déclaration d'un objet
+					while ((o = inStream.readObject()) != null) //on s'assure que l'on recois pas un objet null
 					{					
 						/**
 						 * If the Server receive a String[] (When a user add a new File)
@@ -147,10 +147,10 @@ public class AccepteClient extends Thread
 						{
 							Message m = (Message) o;
 							//sf.createLabel(m.getClient().getName() + " : " + m.getMessage());
-							showMessage(m.getClient().getName(), m.getMessage());
-							for (AccepteClient accepteClient : listClientsConnected) 
+							showMessage(m.getClient().getName(), m.getMessage()); // écrit le message dans la console
+							for (AccepteClient accepteClient : listClientsConnected)  //on parcour les clients
 							{
-								accepteClient.outStream.writeObject(m); //écrit dans gui du srv
+								accepteClient.outStream.writeObject(m); //on envoie le message a ce client
 								accepteClient.outStream.flush();
 							}
 
@@ -189,16 +189,27 @@ public class AccepteClient extends Thread
 	 */
 	private void updateClientList() throws IOException 
 	{
-		ArrayList<Client> alClient = new ArrayList<Client>();
+		ArrayList<Client> alClient = new ArrayList<Client>(); //je crée une liste de client.
+		//parcour toute les liste qui s'appelle "listClientsConnected" de la class AccepteClient
 		for (AccepteClient accepteClient : listClientsConnected) 
 		{
-			alClient.add(accepteClient.myClient);
+			alClient.add(accepteClient.myClient); //on rajoute tout les clients CONNECTÉ a la liste
 		}
+		
+		//Je prévien tout les clients du changement de la liste
 		for (AccepteClient accepteClient : listClientsConnected) 
 		{
-			accepteClient.outStream.writeObject(alClient);
+			accepteClient.outStream.writeObject(alClient); //on envoie la nouvelle liste
 			accepteClient.outStream.flush();
 		}
+		
+		//le for en mode foreach
+		//		for (int i = 0; i < listClientsConnected.size();i++)
+		//		{
+		//		AccepteClient accepteClient = listClientsConnected.get(i);
+		//		accepteClient.outStream.writeObject(alClient); //on envoie la nouvelle liste
+		//		accepteClient.outStream.flush();
+		//		}
 	}
 
 	/**
@@ -206,7 +217,7 @@ public class AccepteClient extends Thread
 	 * 
 	 * @throws IOException
 	 */
-	private void updateFileClient() throws IOException 
+	private void updateFileClient() throws IOException  //même principe que updateClientList sauf que je parcour jusu'a tomber sur ma référence
 	{
 		ArrayList<Client> ClientAddFile = new ArrayList<Client>();
 		for (AccepteClient clientConnected : listClientsConnected) 

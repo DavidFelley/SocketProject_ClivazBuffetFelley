@@ -220,10 +220,10 @@ public class ClientFrame
         lblErrorServer.setBounds(121, 499, 522, 22);
         pnlServer.add(lblErrorServer);
 
-        //Afin de faire des tests plsu rapidement nous mettons des donnï¿½e en dur (mettre en commentaire par la suiste)
-        jtxtfServer.setText("");
-        jtxtfLogin.setText("");
-        jtxtfPassword.setText("");
+        //Afin de faire des tests plus rapidement nous mettons des données en dur (mettre en commentaire par la suite)
+//        jtxtfServer.setText("192.168.0.15");
+//        jtxtfLogin.setText("");
+//        jtxtfPassword.setText("1234");
 
         DefaultCaret caret = (DefaultCaret) txtAreaChat.getCaret();
         caret.setUpdatePolicy(DefaultCaret.OUT_BOTTOM);
@@ -239,16 +239,15 @@ public class ClientFrame
         String ipServer = jtxtfServer.getText();
         Socket clientSocket;
         String ipClient = "";
-        
-		try 
+        String login = jtxtfLogin.getText();
+        String password = jtxtfPassword.getText();
+		
+        try 
 		{
 			clientSocket = new Socket(ipServer, 45000);
-		
-
-        ipClient = clientSocket.getLocalAddress().getHostAddress();
-        inStream = new ObjectInputStream(clientSocket.getInputStream());
-        outStream = new ObjectOutputStream(clientSocket.getOutputStream());
-        
+	        ipClient = clientSocket.getLocalAddress().getHostAddress();
+	        inStream = new ObjectInputStream(clientSocket.getInputStream()); //l'objet qui permettra de recevoir des objets
+	        outStream = new ObjectOutputStream(clientSocket.getOutputStream()); //l'objet qui permettra d'envoyer des objets        
 		} 
 		catch (IOException e) 
 		{
@@ -256,184 +255,20 @@ public class ClientFrame
             frame.repaint();
             frame.validate();
 		}
-        String login = jtxtfLogin.getText();
-        String password = jtxtfPassword.getText();
-
+        //la déclaration des variables utilisée doivent être déja déclarée sinon erreur
         listOfFiles = getListOfFiles();
-
         myClient = new Client(login, password, ipClient, listOfFiles, exist);
 
         try 
         {
-			outStream.writeObject(myClient);
-			int controle = inStream.readInt();
-			controleConnection(controle);
+			outStream.writeObject(myClient); // Envoie le client au server pour authentification et le repertorie dans la liste
+			controleConnection(inStream.readInt()); // On regarde la reponse du server et on l'envoie a contrôle connection
 		} 
         catch (IOException e) 
         {
 			//e.printStackTrace();
 		}
     }
-
-    /**
-     * Method that listen continuously to the server and change the frame
-     * 
-     * Listen to Client connection
-     * Listen to new Message
-     * Listen to new File shared
-     * 
-     */
-    private void listenServer()
-    {
-        new Thread(new Runnable() 
-        {
-            @SuppressWarnings("unchecked")
-			@Override
-            public void run() 
-            {
-                while(true) 
-                {
-                    try 
-                    {
-                        Object o = inStream.readObject();
-                        
-                        
-                        /**
-                         * If the object received is a message
-                         * 
-                         */
-                        if (o instanceof Message) 
-                        {
-                            Message m = (Message) o;
-                            String sender;
-                            /**
-                             * If we are the sender of the Message we show "Me"
-                             * 
-                             */
-                            if (m.getClient().getName().equals(myClient.getName())) 
-                            {
-                                sender = "Me";
-                            } 
-                            else 
-                            {
-                                sender = m.getClient().getName();
-                            }
-                            showNewMessage(sender, m.getMessage());
-                        }
-
-                      
-                        /**
-                         * If the object received is an ArrayList
-                         * 
-                         */
-                        if (o instanceof ArrayList) 
-                        {
-                            if (((ArrayList) o).size() > 0) 
-                            {
-                            	listOfClients = (ArrayList<Client>) o;
-
-                                if (jcbobxForClient.getItemCount() >= 1) 
-                                {
-                                    jcbobxForClient.removeAllItems();
-                                }
-                                for (Client thisClient : listOfClients) 
-                                {
-                                		jcbobxForClient.addItem(thisClient);
-                                }
-                            }
-                        }
-                    } 
-                    catch (IOException | ClassNotFoundException e) 
-                    {
-                        lblError.setText("Connection to server lost!");
-                        myCardLayout.show(pnlMain, "panelLogin");
-                        outStream = null;
-                        inStream = null;
-                    }
-                }
-            }
-        }).start();
-
-        /**
-         * Thread listening to Client trying to reach a File
-         * 
-         */
-        new Thread(new Runnable() 
-        {         
-            @Override
-            public void run() 
-            {
-                try 
-                {
-                    myHostClient = new ServerSocket(45001, 10, InetAddress.getByName(myClient.getIp()));
-
-                    Object oClient = null;
-                    while (true) 
-                    {
-                       /**
-                        * Creation of the socket between the two Client
-                        * 
-                        */
-                        clientRequestSocket = myHostClient.accept();
-                        inStreamClienttoClient = new ObjectInputStream(clientRequestSocket.getInputStream());
-                        outStreamClienttoClient = clientRequestSocket.getOutputStream();
-                        try 
-                        {
-                            oClient = inStreamClienttoClient.readObject();
-                        } 
-                        catch (ClassNotFoundException | IOException e) 
-                        {
-                            e.printStackTrace();
-                        }
-
-                        /**
-                         * If the object received is a FileRequest
-                         * 
-                         */
-                        if (oClient instanceof FileRequest) 
-                        {
-                            FileRequest frClient = (FileRequest) oClient;
-                            File dlDirectory = new File(directoryFiles);
-                            if (!dlDirectory.exists() || !frClient.getTarget().getIp().equals(myClient.getIp()))
-                            {
-                                return; 
-                            }                         
-                            File monFichier = null;
-                            for (File f : dlDirectory.listFiles()) 
-                            {
-                                if (f.getName().equals(frClient.getNameFile())) 
-                                {
-                                    monFichier = f;
-                                    break;
-                                }
-                            }                           
-                            Files.copy(Paths.get(monFichier.getAbsolutePath()), outStreamClienttoClient);
-                            clientRequestSocket.close();
-                        }
-                    }
-                } 
-                catch (IOException e1) 
-                {
-                    e1.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    /**
-     * Method showing the Message received with Time
-     * 
-     * @param sender
-     * @param message
-     */
-    private void showNewMessage(String sender, String message) 
-    {
-        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("HH:mm");
-        String dateFormated = formatDate.format(LocalDateTime.now());
-
-        txtAreaChat.append("[" + dateFormated  + "] " + sender + " : " + message + "\n");
-    }
-
     /**
      * Method listening to server answer after the connection request
      * 
@@ -468,16 +303,199 @@ public class ClientFrame
     }
 
     /**
+     * Method that listen continuously to the server and change the frame
+     * 
+     * Listen to Client connection
+     * Listen to new Message
+     * Listen to new File shared
+     * 
+     */
+    private void listenServer()
+    {
+    	
+//    	Thread t = new Thread(
+//    			new Runnable() 
+//    			{
+//    				public void run()
+//    				{
+//    					//code
+//    				}
+//				});
+//    	t.start();
+
+//   	new Thread(
+//    			new Runnable() 
+//    			{
+//    				public void run()
+//    				{
+//    					//code
+//    				}
+//				}).start();
+    	
+        new Thread(new Runnable() 
+        {
+            @SuppressWarnings("unchecked")
+			@Override
+            public void run() 
+            {
+                while(true) 
+                {
+                    try 
+                    {
+                        Object o = inStream.readObject();                        
+                        /**
+                         * If the object received is a message
+                         * 
+                         */
+                        if (o instanceof Message) 
+                        {
+                            Message m = (Message) o;
+                            String sender;
+                            /**
+                             * If we are the sender of the Message we show "Me"
+                             */
+                            // 1 msg plutot que plein de if sur le srv
+                            if (m.getClient().getName().equals(myClient.getName())) 
+                            {
+                                sender = "Me";
+                            } 
+                            else 
+                            {
+                                sender = m.getClient().getName();
+                            }
+                            showNewMessage(sender, m.getMessage());
+                        }
+
+                      
+                        /**
+                         * If the object received is an ArrayList
+                         * 
+                         */
+                        if (o instanceof ArrayList) //automatiquement arrayliste de client
+                        {
+                            if (((ArrayList) o).size() > 0) 
+                            {
+                            	listOfClients = (ArrayList<Client>) o;
+
+                                if (jcbobxForClient.getItemCount() >= 1) 
+                                {
+                                    jcbobxForClient.removeAllItems();
+                                }
+                                for (Client thisClient : listOfClients) 
+                                {
+                                		jcbobxForClient.addItem(thisClient);
+                                }
+                            }
+                        }
+                    } 
+                    catch (IOException | ClassNotFoundException e) 
+                    {
+                        lblError.setText("Connection to server lost!");
+                        myCardLayout.show(pnlMain, "panelLogin");
+                        outStream = null;
+                        inStream = null;
+                    }
+                }
+            }
+        }).start();
+
+        /**
+         * Thread listening to Client trying to reach a File
+         * 
+         */
+        //Thread pour le téléchargement coté server 
+        new Thread(new Runnable() 
+        {         
+            @Override
+            public void run() 
+            {
+                try 
+                {
+                    myHostClient = new ServerSocket(45001, 10, InetAddress.getByName(myClient.getIp()));
+
+                    Object oClient = null;
+                    while (true) 
+                    {
+                       /**
+                        * Creation of the socket between the two Client
+                        * 
+                        */
+                        clientRequestSocket = myHostClient.accept(); //une fois la demande acceptée , je traite la demande
+                        inStreamClienttoClient = new ObjectInputStream(clientRequestSocket.getInputStream());
+                        outStreamClienttoClient = clientRequestSocket.getOutputStream();
+                        try 
+                        {
+                            oClient = inStreamClienttoClient.readObject();
+                        } 
+                        catch (ClassNotFoundException | IOException e) 
+                        {
+                            e.printStackTrace();
+                        }
+
+                        /**
+                         * If the object received is a FileRequest
+                         * 
+                         */
+                        if (oClient instanceof FileRequest) 
+                        {
+                        	//Parcourire liste fichier
+                        	
+                        	
+                        	//
+                            FileRequest frClient = (FileRequest) oClient;
+                            File dlDirectory = new File(directoryFiles); 
+                            if (!dlDirectory.exists() || !frClient.getTarget().getIp().equals(myClient.getIp()))
+                            {
+                                return; 
+                            }                         
+                            File monFichier = null;
+                            for (File f : dlDirectory.listFiles()) //parcour la liste de fichier du client demandé
+                            {
+                                if (f.getName().equals(frClient.getNameFile())) 
+                                {
+                                    monFichier = f; //on obtient le fichier
+                                    break;
+                                }
+                            }                           
+                            Files.copy(Paths.get(monFichier.getAbsolutePath()), outStreamClienttoClient); // on envoie le fichier au client
+                            clientRequestSocket.close();
+                        }
+                    }
+                } 
+                catch (IOException e1) 
+                {
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * Method showing the Message received with Time
+     * 
+     * @param sender
+     * @param message
+     */
+    private void showNewMessage(String sender, String message) 
+    {
+        DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("HH:mm");
+        String dateFormated = formatDate.format(LocalDateTime.now());
+
+        txtAreaChat.append("[" + dateFormated  + "] " + sender + " : " + message + "\n");
+    }
+    
+    /**
      * Method of creation of the Client.ListOfFiles
      * 
      * @return files
      */
-    private String[] getListOfFiles() {
+    private String[] getListOfFiles()
+    {
         File directory = new File(directoryFiles);
 
         if (!directory.exists()) 
         {
-            directory.mkdir(); //crï¿½ation du dossier
+            directory.mkdir(); //création du dossier
         }
         
         String[] files = new String[directory.list().length];
@@ -507,7 +525,7 @@ public class ClientFrame
             Files.copy(sourceDirectory, targetDirectory);
                         
             newListOfFile = getListOfFiles();
-            outStream.writeObject(newListOfFile);
+            outStream.writeObject(newListOfFile); //envoie de notre NOUVELLE liste de fichier au server
             outStream.flush();            
         } 
         catch (Exception e) 
@@ -577,7 +595,7 @@ public class ClientFrame
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            sendMessage();
+            sendMessageToServer();
         }
     }
 
@@ -585,11 +603,11 @@ public class ClientFrame
      * Method for sending a Message to the server
      * 
      */
-	private void sendMessage() 
+	private void sendMessageToServer() 
 	{
 		try 
 		{
-            outStream.writeObject(new Message(txtFMsgSend.getText(), myClient));
+            outStream.writeObject(new Message(txtFMsgSend.getText(), myClient)); //envoie du message vers le server
             outStream.flush();
             txtFMsgSend.setText("");
         } 
@@ -608,7 +626,7 @@ public class ClientFrame
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            model.removeAllElements(); //enlï¿½ve l'affichage des fichiers dans la liste
+            model.removeAllElements(); //enlève l'affichage des fichiers dans la liste
 
             if (jcbobxForClient.getItemCount() > 0) { //si il y a quelque chose dans la liste
                 //remplissage du panel par rapport aux clients connecter.
@@ -679,7 +697,7 @@ public class ClientFrame
     	{
             if(e.getKeyCode() == KeyEvent.VK_ENTER)
             {
-            	sendMessage();
+            	sendMessageToServer();
             }
     	}
 	}
